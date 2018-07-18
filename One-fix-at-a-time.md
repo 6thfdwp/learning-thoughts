@@ -1,5 +1,5 @@
-#### [Fix varying column height in Bootstrap](https://medium.com/wdstack/varying-column-heights-in-bootstrap-4e8dd5338643)
-
+[Fix varying column height in Bootstrap](https://medium.com/wdstack/varying-column-heights-in-bootstrap-4e8dd5338643)
+--
 >  The Bootstrap height issue occurs because the columns (col-*-*) use float:left. When a column is “floated” it’s taken out of the normal flow of the document. It is shifted to the left or right until it touches the edge of its containing box. So, when you have uneven column heights, the correct behavior is to stack them to the closest side.
 
 1. Make column equal height
@@ -38,9 +38,9 @@ Official Bootstrap [responsive reset](http://getbootstrap.com/css/#grid-responsi
 
 If we want CSS only solution, we can use `nth-child`
 
----
 
-#### [Overlay position](https://tympanus.net/codrops/2013/11/07/css-overlay-techniques/)
+[Overlay position](https://tympanus.net/codrops/2013/11/07/css-overlay-techniques/)
+--
 ```css
 <body>
   <div class='overlay'/>
