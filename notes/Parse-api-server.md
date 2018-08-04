@@ -2,11 +2,13 @@
 [# 4672 File (image, pdf..) access control](https://github.com/parse-community/parse-server/issues/4672),
 [# 1023](https://github.com/parse-community/parse-server/issues/1023)
 > The deletion is working with the file URL without app ID. i.e.:
+```sh
+# not working
+curl -X DELETE -H "X-Parse......" http://domain/parse/files/appid/file
 
-`curl -X DELETE -H "X-Parse...... http://domain/parse/files/appid/file`   
-is not working but
-
-`curl -X DELETE -H "X-Parse...... http://domain/parse/files/file` does
+# working
+curl -X DELETE -H "X-Parse...... http://domain/parse/files/file`
+```
 
 [# Discussion parse server in cloud scale](https://github.com/parse-community/parse-server/issues/4278)  
 [# Discussion on perf](https://github.com/parse-community/parse-server/issues/2539)  
@@ -79,7 +81,7 @@ by calling each `expressRouter()` implementation
 - PublicAPIRouter
 - Promise based router (ClassesRouter, UsersRouter ..)
 
-For Promise based routers, each subclass router defines each type of sub-path -handler mapping, PromiseRouter do the control (mounting, executing..). Basically each subclass creation call PromiseRouter.constructor with each overriding `mountRoutes` method, e.g    
+For Promise based routers, each subclass router defines each type of sub-path to handler mapping, PromiseRouter do the control (mounting, executing..). Basically each subclass creation call PromiseRouter.constructor with each overriding `mountRoutes` method, e.g    
 ```js
 // ClassesRouter.mountRoutes
 this.route('GET', '/classes/:className', (req) => {
@@ -110,7 +112,7 @@ We can see all routes config during app bootstrap
 [PromiseRouter.route]: GET /login
 [PromiseRouter.route]: POST /login
 ```
-In `PromiseRouter.expressRouter`, the actual mounting happens here, each sub router actual get obtains `express.Router()` instance, and mount their routes:   
+In `PromiseRouter.expressRouter`, the actual mounting happens here, each sub router obtains `express.Router()` instance, and mount their routes:   
 ```js
 // PromiseRouter
 expressRouter() {

@@ -81,11 +81,10 @@ plugins: [
 ]
 ```
 
-**Server rendering**
-
-[SSR](https://medium.com/front-end-hacking/server-side-rendering-with-react-and-express-382591bfc77c)  
+**Server rendering**  
 [SSR with router](https://tylermcginnis.com/react-router-server-rendering/)   
-[Another demystifying SSR](https://medium.freecodecamp.org/demystifying-reacts-server-side-render-de335d408fe4)
+[Another demystifying SSR](https://medium.freecodecamp.org/demystifying-reacts-server-side-render-de335d408fe4)   
+[HMR Everything](https://hackernoon.com/hot-reload-all-the-things-ec0fed8ab0)
 
 Use separate webpack.server.config.js, run webpack compile and start bundled file  
 In order for webpack play nicely with existing express app structure, need to set `node: {__dirname:true}` option in webpack, this gives proper relative path for each module, e.g `server/src/routes` for `server/src/routes/static.js`, So `path.resovle(__dirname, 'views')` will properly give absolute path for hbs views, as it's defined in app.js located `server/src`
@@ -93,16 +92,14 @@ In order for webpack play nicely with existing express app structure, need to se
 The public seems unaffected: `app.use(express.static('public'))`, though app.js is in `server/src`
 
 • express route matches, import component in server  
-• `renderToString(<RootComp />)` produces the whole markup and get sent to client   
-• Client also download bundled js and directly render the initial markup with `hyrate(<RootComp />)`  
-• Browser execute the bundled js and React again take over where server left off, specifically just bind event listener, but not re-render whole app
-
+• `renderToString(<StaitcRouter path=''><SharedApp /><StaitcRouter>)` produces the whole markup and get sent to client   
+• Client also download bundled js and directly render the initial markup with `hyrate(<BrowserRouter><SharedApp /></BrowserRouter>)`  
+• Browser execute the bundled js and React again take over where server left off, specifically just bind event listener, but not re-render whole app  
+NOTE:  
+SharedApp mount routes from same route config, in server wrapped in StaitcRouter, where path matches actually happens. From express point of view, we only have one route
 
 The dev flow is like:
 webpack -w server config -> ~~run nodemon server.bundle (need & for parallel)~~ -> StartServerPlugin to run bundled server code -> start webpack-dev-server (another webpack -w) on 9000 for client bundle (avoid conflict with webpack server watch),
-
-1. A single console with one command (npm run dev) to start dev
-2. client hot load, server watch and actual express web server
 
 **Plugins config**
 
