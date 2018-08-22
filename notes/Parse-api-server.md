@@ -12,7 +12,14 @@ curl -X DELETE -H "X-Parse...... http://domain/parse/files/file`
 
 [# Discussion parse server in cloud scale](https://github.com/parse-community/parse-server/issues/4278)  
 [# Discussion on perf](https://github.com/parse-community/parse-server/issues/2539)  
-[# Scale horizontally](https://github.com/parse-community/parse-server/issues/4564)
+[# Scale horizontally](https://github.com/parse-community/parse-server/issues/4564)   
+[# Cache grows without prune](https://github.com/parse-community/parse-server/issues/4247)
+
+```
+Startup a parse-server, without enableSingleSchemaCache
+use heapdump through require('heapdump') in your startup script
+notice that the memory keeps growing after each request.
+```
 
 ## Contribute to Parse server
 ##### [Git fork and PR flow](https://gist.github.com/Chaser324/ce0505fbed06b947d962)
@@ -49,6 +56,77 @@ curl -X DELETE -H "X-Parse...... http://domain/parse/files/file`
  npm start -- --appId xx --masterKey yy --databaseURI ..
  node ./bin/parse-server -> require('cli/parse-server')
 ```
+**§ ParseServer.constructor:**   
+
+The main thing here is to load all the controller instance, attach to config object. This config will be attached to `express` req (?), in router handler, we can easily access controller exposed methods (from adapter)
+```js
+// ParseServer.js
+class ParseServer {
+  constructor(options) {
+    // options could contain custom adapter we use, like auth, file storage
+    injectDefaults(options);
+    ...
+    // options used to tell controller to attach proper adapters
+    const allControllers = controllers.getControllers(options);
+    //
+    this.config = Config.put(Object.assign({}, options, allControllers));
+  }
+}
+
+// controller/index.js
+export function getControllers(options: ParseServerOptions) {
+  ..
+  const cacheController = getCacheController(options);
+  const filesController = getFilesController(options);
+  ..
+  // auth adapter handled a bit weird via Adapters/Auth/index.js
+  // no actual controller wraps around adapter, instead it exposes getValidatorForProvider attached to config,
+  // see usage during handleAuthData in RestWrite.js
+  const authDataManager = getAuthDataManager(options);
+}
+
+function getCacheController(options) {
+  // cacheAdapter, cacheTTL etc will be filled by injectDefaults(options)
+  // if not provided
+  const {
+    appId,
+    cacheAdapter,
+    cacheTTL,
+    cacheMaxSize,
+  } = options;
+
+  // if no cache options, InMemoryCacheAdapter will be used
+  // loadAdapter support various adapter option format, could be module name (String), function or Class,
+  // eventually resolves them to object that contains necessary methods implemented,
+  // these required methods will be defined in base Class (like interface) for a particular adapter
+  const cacheControllerAdapter =
+  loadAdapter(
+    cacheAdapter, InMemoryCacheAdapter,
+    {appId: appId, ttl: cacheTTL, maxSize: cacheMaxSize }
+  );
+  return new CacheController(cacheControllerAdapter, appId);
+}
+```
+Controller mostly wrap methods adapters implement, but possibly add extra logic used during Rest read / write, also it is able to validate if proper adapter passed.
+```js
+// Controllers/CacheController.js
+export class CacheController extends AdaptableController {
+  // base class constructor injects actual adapter to do stuff
+
+  get(key) {..}
+
+  put(key, value, ttl) {
+    const cacheKey = joinKeys(this.appId, key);
+    return this.adapter.put(cacheKey, value, ttl);
+  }
+  // base class provides validation logic against what returned from this method
+  expectedAdapterType() {
+    return CacheAdapter;
+  }
+}
+```
+
+
 **§ ParseServer.start:**
 ```js
  // this.app serves Parse API endpoint (/classes, /functions..)
@@ -72,6 +150,7 @@ curl -X DELETE -H "X-Parse...... http://domain/parse/files/file`
    return api;
  }
 ```
+
 **§ Routes mounting**
 
 It all happens when intializing ParseServer.app, 3 major routers are mounted
@@ -182,6 +261,7 @@ handleParseHeaders(req, res, next) {
     req.auth = auth;
     next();
   })
+  
   // in src/Auth.js
   getAuthForSessionToken = function({config, sessionToken, installationId}) {
     // if user can be found from cache
@@ -240,7 +320,7 @@ RestWrite.handleAuthData
 **Resolving**:  
 take specifier (`express`) / relative path (`./util/time`) -> absolute path which can be loaded into Node and used
 
-**Loading**:
+**Loading**:  
 Take absolute path from **Resolving** phase, 'Read' the file content which path pointing to. (For js/JSON, just load the text source into memory, for native module, loading involve linking to Node.js process)
 
 **Wrapping**  
@@ -274,7 +354,7 @@ It's where callback listeners stay. When JS calls native API, (setTimeout, http.
 We actually have more than one queue: macro-tasks and micro-tasks... As said, exact one macro task should be processed in one cycle of event loop, after this, all available micro tasks should be processed within one cycle
 
 **Event loop:**
-Check call stack, if it's empty, pick the first callback from **Task Queue**, push to call stack to execute (e.g read response / file content). This happens like infinite fashion, hence
+Check call stack, if it's empty, pick up the first task from Task Queue, push to call stack to execute (e.g process response / file content). This happens like infinite fashion, hence loop
 
 Note, the callback doesn't have to be async
 ```js

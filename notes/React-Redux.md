@@ -75,7 +75,7 @@ const combineReducers = (reducers) => {
   return (state= {}, action) => {
     return Object.keys(reducers)
       .reduce((nextState, key) => {
-         // call each reducer to producer the whole updated state tree
+         // call each reducer to produce the whole updated state tree
          nextState[key] = reducers[key](state[key], action)
          return nextState;
       }, {}) // a new initial nextState
