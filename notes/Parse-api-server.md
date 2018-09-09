@@ -1,18 +1,17 @@
-[# Private fields filtering when query](https://github.com/parse-community/parse-server/issues/3155) with [PR#3158](https://github.com/parse-community/parse-server/pull/3158)  
-[# 4672 File (image, pdf..) access control](https://github.com/parse-community/parse-server/issues/4672),
+[# Private fields filtering ](https://github.com/parse-community/parse-server/issues/3155) with [PR 3158](https://github.com/parse-community/parse-server/pull/3158)   
+[# 4672 File (image, pdf..) access control](https://github.com/parse-community/parse-server/issues/4672),   
 [# 1023](https://github.com/parse-community/parse-server/issues/1023)
 > The deletion is working with the file URL without app ID. i.e.:
 ```sh
 # not working
 curl -X DELETE -H "X-Parse......" http://domain/parse/files/appid/file
-
 # working
-curl -X DELETE -H "X-Parse...... http://domain/parse/files/file`
+curl -X DELETE -H X-Parse...... http://domain/parse/files/file
 ```
 
-[# Discussion parse server in cloud scale](https://github.com/parse-community/parse-server/issues/4278)  
-[# Discussion on perf](https://github.com/parse-community/parse-server/issues/2539)  
-[# Scale horizontally](https://github.com/parse-community/parse-server/issues/4564)   
+[# Discussion parse server in cloud scale](https://github.com/parse-community/parse-server/issues/4278)   
+[# Discussion on perf](https://github.com/parse-community/parse-server/issues/2539)   
+[# Scale horizontally](https://github.com/parse-community/parse-server/issues/4564)    
 [# Cache grows without prune](https://github.com/parse-community/parse-server/issues/4247)
 
 ```
@@ -22,8 +21,9 @@ notice that the memory keeps growing after each request.
 ```
 
 ## Contribute to Parse server
-##### [Git fork and PR flow](https://gist.github.com/Chaser324/ce0505fbed06b947d962)
- • Go to original repo (e.g parse-server) to fork as your own   
+☞ [Git fork and PR flow](https://gist.github.com/Chaser324/ce0505fbed06b947d962)
+
+ •  Go to original repo (e.g parse-server) to fork as your own   
  • `git clone https://github.com/YOUR-USERNAME/parse-server`   
  ```sh
  $ git remote add upstream https://github.com/UPSTREAM-USER/ORIGINAL-PROJECT.git
@@ -40,6 +40,12 @@ notice that the memory keeps growing after each request.
  # may need to integrate upstream changes before commit new-feature branch
  # then go to original repo to open a new PR, it will keep tracking the changes
  # on the local dev branch (new-feature) every time we push new commits to it
+ ```
+ #### Local dev
+ If we need to use parse-server code we are currently working on,
+ ```sh
+ npm link parse-server path/to/cloned/repo
+ npm install
  ```
 
 ## [Security](http://docs.parseplatform.org/js/guide/#security)
@@ -58,7 +64,7 @@ notice that the memory keeps growing after each request.
 ```
 **§ ParseServer.constructor:**   
 
-The main thing here is to load all the controller instance, attach to config object. This config will be attached to `express` req (?), in router handler, we can easily access controller exposed methods (from adapter)
+The main thing here is to load all the controller instance, attach to config object. This config will be attached to `express` req (?), in router handler, we can easily access controller exposed methods (eventually calling into adapter), caller are able to be decoupled from specific adapter.
 ```js
 // ParseServer.js
 class ParseServer {
@@ -97,7 +103,7 @@ function getCacheController(options) {
 
   // if no cache options, InMemoryCacheAdapter will be used
   // loadAdapter support various adapter option format, could be module name (String), function or Class,
-  // eventually resolves them to object that contains necessary methods implemented,
+  // eventually resolves them to object that contains necessary implemented methods,
   // these required methods will be defined in base Class (like interface) for a particular adapter
   const cacheControllerAdapter =
   loadAdapter(
@@ -261,7 +267,7 @@ handleParseHeaders(req, res, next) {
     req.auth = auth;
     next();
   })
-  
+
   // in src/Auth.js
   getAuthForSessionToken = function({config, sessionToken, installationId}) {
     // if user can be found from cache
@@ -308,59 +314,3 @@ RestWrite.handleAuthData
 **§ ParseQuery transform**  
 
 `Adapters/Storage/Mongo/MongoTransform.js`
-
-
-## Node Topics
-#### [ESM and CommonJS module ](https://hackernoon.com/node-js-tc-39-and-modules-a1118aecf95e)   
-
-[ESM in Node status and future](https://medium.com/@giltayar/native-es-modules-in-nodejs-status-and-future-directions-part-i-ee5ea3001f71)  
-[CommonJS Require anatomy ](https://medium.freecodecamp.org/requiring-modules-in-node-js-everything-you-need-to-know-e7fbd119be8)
-
-![require steps](https://cdn-images-1.medium.com/max/1600/1*Rn5xTqjKdPZuG7VnqMzN1w.png)
-**Resolving**:  
-take specifier (`express`) / relative path (`./util/time`) -> absolute path which can be loaded into Node and used
-
-**Loading**:  
-Take absolute path from **Resolving** phase, 'Read' the file content which path pointing to. (For js/JSON, just load the text source into memory, for native module, loading involve linking to Node.js process)
-
-**Wrapping**  
-Take file content from **Loading**, wrap them in a function before passing to JS VM to evaluation
-```js
-function (exports, require, module, __filename, __dirname) {
-  // our module code
-  // const express = require('express');
-  // const router = express.router();
-  // module.exports = router;
-}
-```
-
-**Evaluating**  
-It's this wrapped fn passed to JS VM evaluated, `exports, module` and variables defined in module are scoped, not truly global. Only when this wrapping fn evaluated, 'exports' object where all symbols attached on can be returned. (This is the result of `require` a module). It's the key difference from ESM, where CommonJS `exports` evaluated dynamically, ESM are defined lexically. In short, ESM exported symbols can be determined when JS parsing before actually evaluated.
-
-**Caching**  
-The returned object will be cached (the key is likely the absolute path of each module), so only first require will go through the whole phases, the subsequent will directly get the module exports.
-
-
-#### [Async I/O and Event loop](https://blog.risingstack.com/node-js-at-scale-understanding-node-js-event-loop/)
-**Single thread (call stack):**  
-refer to JS runtime (eg. V8, I think these things that implement ECMA specs), one call stack frame (note heap is another data structure for object allocation, those objects used in fn execution are only pointers pushed/popped in the call stack). Call stack is also what error stack trace print out when some bad happens
-
-**Concurrency**
-Even JS runtime is single thread, the native side is multi threads. JS is able to call browser or C++ API (if in Node) to make long running operations run concurrently without blocking the call stack
-
-**Task Queue:**
-It's where callback listeners stay. When JS calls native API, (setTimeout, http.get, readFile etc.) it actually send operations to background threads, also attach listeners. After operations finish, the callback listeners get into the task queue.  
-
-We actually have more than one queue: macro-tasks and micro-tasks... As said, exact one macro task should be processed in one cycle of event loop, after this, all available micro tasks should be processed within one cycle
-
-**Event loop:**
-Check call stack, if it's empty, pick up the first task from Task Queue, push to call stack to execute (e.g process response / file content). This happens like infinite fashion, hence loop
-
-Note, the callback doesn't have to be async
-```js
-// the 'do' executed in sync way, if the do take long time,
-// it will block the call stack
-array.forEach(i => do(i))
-```
-
-[async/await operator](https://github.com/mbeaudru/modern-js-cheatsheet/issues/54)

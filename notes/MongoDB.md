@@ -1,4 +1,4 @@
-[§ Scheme design](https://www.mongodb.com//blog/post/6-rules-of-thumb-for-mongodb-schema-design-part-1)
+[§ Scheme design](https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design-part-1)
 --
 ```
 • When prefer embedded objects and when not (many side contains hundreds of items, or
@@ -44,4 +44,45 @@
 ```
  offer:{$in:[]}, included:{$ne:false}
  food:{$eq:'foodId'}, offer:{$existed:true}, included:{$ne:false}
+```
+
+### Mongo shell
+```sh
+# connect
+> mongo <domain:port>/db -u <> -p <>
+
+# query explain
+db.FoodOffer.explain('executionStats')
+  .find({
+    location:{$near:[18.0685808,59.3293234999],$maxDistance:0.07},
+    days:'Thu', deleted:{$ne:true}
+  })
+
+# redirect mongo query result
+> mongo <domain>:<port>/mikdb -u <user> -p <> --eval "printjson(db.Offer.find({days:'Thu',available:true}).explain() )"  >> out.json
+
+> mongoexport -h <host> -d <db> -c Order -u <user> -p <password> -o <output> --type=csv -q '{_created_at:{$gt: { "$date": "2017-01-01T00:00:00.001Z"} }}' -f "<fields>"
+# export json
+mongoexport -h <host> -d <db> -c <collection> -u <user> -p <password> -o out.json
+```
+Run aggregation pipeline
+```sh
+db.getCollection('_User').aggregate([
+  {$match: {"username": {"$ne": null}}},
+  # group by username field , add its object id to set, do counting
+  {$group: {_id: "$username", uniqueIds: {$addToSet: "$_id"}, count: {$sum: 1}}},
+  {$match: {count: {"$gt": 1}}},
+  # map result id: [user.id set]
+  {$project: {id: "$uniqueIds", username: "$_id", _id : 0} },
+  {$unwind: "$id" },
+])
+
+db.Order.aggregate([
+  {$match:{"paid": true}},
+  {$group:{_p_user:"$_p_user", count: {$sum: 1}} },
+  {$sort: {count: -1}},
+  # directly save result to a new collection
+  {$out: "out"}
+]);
+
 ```

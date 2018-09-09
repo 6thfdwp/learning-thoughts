@@ -1,6 +1,6 @@
 This learning starts from inspiring series of blog posts [Didact: DIY your own React](https://engineering.hexacta.com/didact-learning-how-react-works-by-building-it-from-scratch-51007984e5c5)
 
-React.Element is object representation of actual UI (DOM in web, View hierarchy in native).  
+React.Element is light weight object representation of actual UI (DOM in web, View hierarchy in native).  
 Component is definition to return the Element.  
 ```js
 StoryLike = ({likes, url, name}) => (
@@ -10,7 +10,7 @@ StoryLike = ({likes, url, name}) => (
   </li>
 )
 ```
-We use JSX `<StoryLike />` to easily compose the hierarchy, which essentially get transpiled via Babel to `React.createElement`, it will recursively check component hierarchy to call `createElement` in each level
+We use JSX `<StoryLike />` to easily compose the hierarchy, which essentially get transpiled via Babel to `React.createElement`, it will recursively check component hierarchy to make nested `createElement` call for each node
 ```js
 createElement(
   'li', {className:'row'},
@@ -100,12 +100,12 @@ render() {
 ```
 when `render(<App title='' />)`, will walk through element object hierarchy to create internal instances end up like:
 
-```js
+```
 CompositeComponent App
  > currentElement: {type: App(function), props:{title, children:[]}}
  > publicInstance: new App()
  > renderedComponent: DOMComponent
-   > currentElement: {type:'div', props:{children:[..]}}
+   > currentElement: {type:"div", props:{children:[..]}}
    > node: div
    > renderedChildren: [
      DOMComponent: {
@@ -130,9 +130,11 @@ CompositeComponent App
 
 > split rendering work into chunks and spread it out over multiple call stack frames.
 
+### Advanced topics
 ---
-The main way (only?) to trigger UI update is by `setState`:  
-[About state answer](https://stackoverflow.com/questions/48563650/does-react-keep-the-order-for-state-updates/48610973#48610973)  
+**State**  
+The main way (only?) to trigger UI update is by `setState`, and then pass further down via `props`:   
+[State answer](https://stackoverflow.com/questions/48563650/does-react-keep-the-order-for-state-updates/48610973#48610973)  
 [Async setState](https://github.com/facebook/react/issues/11527#issuecomment-360199710)
 
 • The state is updated in the same order as setState called, the most recent value of the same state key 'wins'  
@@ -144,3 +146,56 @@ setState(pendingState: object || func, callback)
 // when next state is based on previous state value
 setState((prevState, props) => ({counter: prevState.counter + props.step}))
 ```
+
+**HOC with Forwarded Ref**   
+Introduced in 16.3, `Forwarded Ref` allow expose child DOM (or component instance) ref to parent component, by `forwarding` this ref variable via `React.createRef()` to the child component we want.  
+How is this related to HOC pattern? Let's review what HOC is first. The definition is that HOC takes a component, return a new component. We use this newly decorated component outside, it has same look and feel as the original component inside.   
+
+Why need this? Main reason is to reuse logic (not UI like other functional components). Separate the logic from the presentation. See example below:
+```js
+function switcher(WrappedComponent) {
+  class Switcher extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        toggled: false
+      }
+    }
+    toggle() {
+      this.setState((prevState, props) => ({toggled: !prevState.toggled}))
+    }
+    render() {
+      // the wrapped can trigger onToggle and re-render
+      // based on toggled state passed into
+      <WrappedComponent
+        {...this.props}
+        toggled={this.state.toggled}
+        onToggle={this.toggle} />
+    }
+  }
+  return Switcher;
+}
+
+switcher(<PlayButton />)
+switcher(<LoopButton />)
+```
+All things can be made switchable. They don't have to be button at all! Anything clickable and have flipped state to show ui accordingly, can be enhanced.
+
+Redux `connect` is similar pattern, make `store.subscribe`, receive new state and `shouldComponentUpdate` reusable, can be opted into any container component that need to be aware of state change.
+
+Let's look at the `forwardRef` now.
+```js
+// ref can only be passed with forwardRef in additional to normal props
+const FancyButton = React.forwardRef((props, ref) => (
+  <button ref={ref} className="FancyButton">
+    {props.children}
+  </button>
+));
+// since FancyButton is forwarding ref, the ref will not point to its own instance
+// FancyButton now have access to underlying button instance via ref.current
+const ref = React.createRef();
+<FancyButton ref={ref}>Click</FancyButton>
+```
+
+Here is another use case for HOC, implemented as `render` callback, allow extra prop `ref` to be passed to child down the tree. Without it, the ref will not be passed.
+`withRouter` has similar way to pass extra route related props (location etc)
