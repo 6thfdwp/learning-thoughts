@@ -23,28 +23,63 @@
 ---
  [Compound index](https://docs.mongodb.com/manual/core/index-compound/#compound-index-prefix)    
  [Remove redundant/unused](http://docs.mlab.com/indexing/#identifying-and-removing-unnecessary-indexes)
-- Offer query pattern
-```
- available:{$ne:false | true}, location:{...}
- kitchen:{$eq:'kitchenId'}, available:{$ne:false}, location:{...}
 
- 3:available:{$ne:false}, days:'Mon', location:{...}
- 4:available:{$eq:true},  days:'Mon', location:{...}
+**Compound index keys order**  
+If we have index `status:-1, deliveryDate:-1, customer:1`:   
+It only support query whose key(s) are subset of the indexed keys, i.e  
 ```
-| `totalKeysExamined`  | `totalDocsExamined`  | `nReturned`  |
-| :-------------: |:-------------:|:-----:|
-|     634   | 180 | 48 |
-|     634   | 180 | 37 |
-|  `location_2d_available_1_days_1  |
-|     3:(30, )    | 4:(26, )   |    4:(13, ) |
-|     4:(30, )    | 4:(4, )   |    4:(4, ) |
+ ✓ status: 'CONFIRMED'  
+ ✓ status: 'CONFIRMED' and deliveryDate: '20180928'
+ ✓ status: 'CONFIRMED' and deliveryDate: '20180928' and customer: 'A'   
+ - status: 'CANCELLED' and customer: 'A' (partial support)
+ ✕ deliveryDate: '20180928'  
+ ✕ customer: 'A'
+```
+
+**Compound index values order**   
+If we want to use index to produce sorted result, it will depend on how we define the value order of index, i.e -1 (descending) or 1 (ascending).   
+Say we have index `status:-1, deliveryDate:-1`:  
+```
+ ✓ sort({status: -1, deliveryDate: -1})
+ ✓ sort({status: 1, deliveryDate: 1})  
+ ✕ sort({status: -1, deliveryDate: 1})  
+ ✕ sort({status: -1, deliveryDate: 1})  
+```
+To understand this, we can visualise how index are listed:  
+```
+status        deliveryDate
+DELETED        20180920
+DELETED        20180910
+CONFIRMED      20180928
+CONFIRMED      20180925
+CONFIRMED      20180920
+CANCELLED      20180925
+```  
+Clearly, we can only traverse in two directions. From top down `sort({status: -1, deliveryDate: -1})` or bottom up.
 
 
-- FoodOffer query pattern
+**CateringOrder**
+```js
+{status:'CONFIRMED', sortby: {deliveryDate: 1}}
 ```
- offer:{$in:[]}, included:{$ne:false}
- food:{$eq:'foodId'}, offer:{$existed:true}, included:{$ne:false}
+|   |totalKeysExamined | totalDocsExamined  | nReturned | sort in memory|
+| :---: | :-------------: |:-------------:|:-----:|   :-----:   |
+|no index|     0   | 344 | 113 | Y|
+|deliveryDate_1|     344   | 344 | 113 | N |
+
+We can see with only `deliveryDate_1` index, db still has to do full scan docs (344) to return matched result which are `status: 'CONFIRMED'`, and then do another index scan (344) to only select those doc references existing in previous matched result and directly produce sorted result. In this case no need to sort again.
+
+**CateringOrderProduct**
+```js
+{_p_cateringOrder: 'CateringOrder$SdFzECO4ry'}
 ```
+|   |totalKeysExamined | totalDocsExamined  | nReturned | sort in memory|
+| :---: | :-------------: |:-------------:|:-----:|   :-----:   |
+|no index|     0   | 967 | 5 | |
+|_p_cateringOrder_1|     5   | 5 | 5 |  |
+
+With single index, it gains best query performance. The # of docs scanned equals to what returned.   
+⍰ How it achieved only scanning 5 keys (equals to # of returned)
 
 ### Mongo shell
 ```sh
@@ -59,7 +94,7 @@ db.FoodOffer.explain('executionStats')
   })
 
 # redirect mongo query result
-> mongo <domain>:<port>/mikdb -u <user> -p <> --eval "printjson(db.Offer.find({days:'Thu',available:true}).explain() )"  >> out.json
+> mongo <domain>:<port>/db -u <user> -p <> --eval "printjson(db.Offer.find({days:'Thu',available:true}).explain() )"  >> out.json
 
 > mongoexport -h <host> -d <db> -c Order -u <user> -p <password> -o <output> --type=csv -q '{_created_at:{$gt: { "$date": "2017-01-01T00:00:00.001Z"} }}' -f "<fields>"
 # export json
