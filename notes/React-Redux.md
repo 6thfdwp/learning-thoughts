@@ -6,11 +6,6 @@ For example, we can use reducer inside component without Redux:
 this.setState((prevState) => reduce(prevState, action))
 ```
 
-• [React new context API](https://tinyletter.com/kentcdodds/letters/react-s-new-context-api)  
-  > new way to avoid deep 'props drilling', no need to reach Redux for just passing down global state
-
-• [Code splitting](https://serverless-stack.com/chapters/code-splitting-in-create-react-app.html)
-
 **Redux `createStore`**:
 ```js
 const createStore = (reducer) => {

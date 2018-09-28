@@ -199,3 +199,36 @@ const ref = React.createRef();
 
 Here is another use case for HOC, implemented as `render` callback, allow extra prop `ref` to be passed to child down the tree. Without it, the ref will not be passed.
 `withRouter` has similar way to pass extra route related props (location etc)
+
+### Performance
+---
+**Understand reconciliation**  
+`shouldComponentUpdate`: "Should component related UI need to be updated?"  
+If yes, we certainly need to perform reconciliation process: re-rendering on that component to generate new elements tree, diff it with previous and figure out DOM updates.  
+If no, we can skip the process from that component and its entire subtree.
+
+Most case, it does not hurt when always re-rendering the whole subtree upon a component state change.
+
+• Functional (stateless) component   
+Implemented as pure function (not Pure component), the output is only based on input props
+
+• PureComponent   
+Class component, stateless or stateful, could perform side effect, but only re-render when props or state changed
+
+• Normal Component
+
+> It is safe to use PureComponents as atoms, ie small and final things like buttons. But it is not safe to use them in chromes, forms, pages and other molecules.
+
+
+**Discover where to optimise**
+
+https://building.calibreapp.com/debugging-react-performance-with-react-16-and-chrome-devtools-c90698a522ad
+
+
+### Caveats
+---
+```
+Can't call setState (or forceUpdate) on an unmounted component,
+it indicates a memory leak in your application
+To fix, cancel all subscriptions and asynchronous tasks
+```

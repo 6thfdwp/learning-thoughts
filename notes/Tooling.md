@@ -1,7 +1,8 @@
 • [Build your own starter](http://andrewhfarmer.com/build-your-own-starter/#0-intro)   
-• [Walk through](https://survivejs.com/webpack/developing/composing-configuration/)  
-• [Serve and proxy webpack dev with express server](https://github.com/christianalfoni/webpack-express-boilerplate)  
-• [Client/Server webpack config](http://jlongster.com/Backend-Apps-with-Webpack--Part-II)  
+• [Composing config](https://survivejs.com/webpack/developing/composing-configuration/)  
+• [Proxy webpack dev server with existing express server](https://github.com/christianalfoni/webpack-express-boilerplate)  
+• [Client/Server webpack config](http://jlongster.com/Backend-Apps-with-Webpack--Part-II)   
+• [How Hot reloading born in React](https://medium.com/@dan_abramov/hot-reloading-in-react-1140438583bf)
 
 When bundled in `webpack-dev-server`, all builds are generated inside its dev server, served from memory (not in our project)  
 See `http://localhost:8080/webpack-dev-server`, including:  
@@ -33,7 +34,8 @@ with proxy, we could access these in-memory bundles via `http://localhost:3000/b
   }, {
     loader: 'postcss-loader', // Run post css actions
     options: {
-      plugins: function () { // post css plugins, can be exported to postcss.config.js
+      // post css plugins, can be exported to postcss.config.js
+      plugins: function () {
         return [
           require('precss'),
           require('autoprefixer')
@@ -91,15 +93,22 @@ In order for webpack play nicely with existing express app structure, need to se
 
 The public seems unaffected: `app.use(express.static('public'))`, though app.js is in `server/src`
 
-• express route matches, import component in server  
-• `renderToString(<StaitcRouter path=''><SharedApp /><StaitcRouter>)` produces the whole markup and get sent to client   
-• Client also download bundled js and directly render the initial markup with `hyrate(<BrowserRouter><SharedApp /></BrowserRouter>)`  
-• Browser execute the bundled js and React again take over where server left off, specifically just bind event listener, but not re-render whole app  
+- express route matches, import component in server  
+- `renderToString(<StaitcRouter path=''><SharedApp /><StaitcRouter>)` produces the whole markup and get sent to client   
+- Client also download bundled js and directly render the initial markup with `hyrate(<BrowserRouter><SharedApp /></BrowserRouter>)`  
+- Browser execute the bundled js and React again take over where server left off, specifically bind event listener, but not re-render whole app  
 NOTE:  
 SharedApp mount routes from same route config, in server wrapped in StaitcRouter, where path matches actually happens. From express point of view, we only have one route
 
-The dev flow is like:
-webpack -w server config -> ~~run nodemon server.bundle (need & for parallel)~~ -> StartServerPlugin to run bundled server code -> start webpack-dev-server (another webpack -w) on 9000 for client bundle (avoid conflict with webpack server watch),
+The dev flow is like:  
+webpack -w webpack.server.config ->   
+StartServerPlugin to run bundled server code ->   
+Start webpack-dev-server (another webpack -w) on 9000 for client bundle (avoid conflict with webpack server watch),
+```sh
+# use this to check running node process, which listening on different ports
+lsof -i -P | grep -i "listen"
+```
+
 
 **Plugins config**
 
@@ -219,6 +228,11 @@ plugins: [
   })
 ]
 ```
+
+• [Code splitting](https://serverless-stack.com/chapters/code-splitting-in-create-react-app.html)
+
+
+
 | `OPS`           | `Stat size`   | `gzip size`  | `Build time`  |
 | :-------------: |:-------------:|:-----:       |:-----:|
 |     Original           | 1.4M  | 350K |    |
