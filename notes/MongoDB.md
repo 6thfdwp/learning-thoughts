@@ -26,18 +26,22 @@
 
 **Compound index keys order**  
 If we have index `status:-1, deliveryDate:-1, customer:1`:   
-It only support query whose key(s) are subset of the indexed keys, i.e  
+It only support query whose key(s) are prefix of the indexed keys, i.e  
 ```
  ✓ status: 'CONFIRMED'  
  ✓ status: 'CONFIRMED' and deliveryDate: '20180928'
- ✓ status: 'CONFIRMED' and deliveryDate: '20180928' and customer: 'A'   
+ 
+ # the order does not matter as long as it has first key 'status', still prefix
+ ✓ deliveryDate: '20180928' and status: 'CONFIRMED'
+ ✓ status: 'CONFIRMED' and deliveryDate: '20180928' and customer: 'A'  
+
  - status: 'CANCELLED' and customer: 'A' (partial support)
  ✕ deliveryDate: '20180928'  
  ✕ customer: 'A'
 ```
 
 **Compound index values order**   
-If we want to use index to produce sorted result, it will depend on how we define the value order of index, i.e -1 (descending) or 1 (ascending).   
+If we want to use index to produce sorted result, it will depend on how we sort the index values, i.e -1 (descending) or 1 (ascending).   
 Say we have index `status:-1, deliveryDate:-1`:  
 ```
  ✓ sort({status: -1, deliveryDate: -1})
@@ -45,7 +49,7 @@ Say we have index `status:-1, deliveryDate:-1`:
  ✕ sort({status: -1, deliveryDate: 1})  
  ✕ sort({status: -1, deliveryDate: 1})  
 ```
-To understand this, we can visualise how index are listed:  
+It shows the index supports when all keys to be sorted are the same or reserved as index sorting direction. To understand this, we can visualise how index are arranged:  
 ```
 status        deliveryDate
 DELETED        20180920
@@ -57,7 +61,7 @@ CANCELLED      20180925
 ```  
 Clearly, we can only traverse in two directions. From top down `sort({status: -1, deliveryDate: -1})` or bottom up.
 
-
+Let's have some examples to see how index affects query plan.   
 **CateringOrder**
 ```js
 {status:'CONFIRMED', sortby: {deliveryDate: 1}}
@@ -66,8 +70,21 @@ Clearly, we can only traverse in two directions. From top down `sort({status: -1
 | :---: | :-------------: |:-------------:|:-----:|   :-----:   |
 |no index|     0   | 344 | 113 | Y|
 |deliveryDate_1|     344   | 344 | 113 | N |
+|status_1_deliveryDate_1|     113   | 113 | 113 | N |
 
 We can see with only `deliveryDate_1` index, db still has to do full scan docs (344) to return matched result which are `status: 'CONFIRMED'`, and then do another index scan (344) to only select those doc references existing in previous matched result and directly produce sorted result. In this case no need to sort again.
+```js
+{
+  completed:{$ne:true}, deleted:{$ne:true}, status:{$ne:'CANCELLED'},
+  sortby: {deliveryDate: 1}
+}
+```
+|   |totalKeysExamined | totalDocsExamined  | nReturned | sort in memory|
+| :---: | :-------------: |:-------------:|:-----:|   :-----:   |
+|no index|     0   | 351 | 58 | |
+|status_1_deliveryDate_1|     351   | 351 | 58 | N |
+
+We can see 'not equal' can not make use of index too much.
 
 **CateringOrderProduct**
 ```js

@@ -122,4 +122,19 @@ commit bad217911cb870b7b4fb849c6c7e97d6ed5e6528
 
 ```
 
-Then we do `git reset --hard HEAD@{7}`
+Then we do `git reset --hard HEAD@{7}`, moving tree head pointing to `b44c378`, update the index, un-stage all commits after it (those we rebased from), as like no commit added, finally update the working directory, give exactly what we have before rebasing.
+
+```sh    
+# 1. new features
+git checkout -b exciting-feature
+git commit
+# push to the same remote branch (origin/exciting-feature) and set upstream to it
+git push -u origin HEAD
+
+git check master
+git pull [origin master]
+git merge exciting-feature
+
+# from current branch to remote master
+git push <remote> HEAD:master
+```
