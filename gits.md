@@ -32,6 +32,21 @@ This flag continues to un-stage everything, making you roll back to what you hav
 
 ![git reset --hard](http://git-scm.com/images/reset/reset-hard.png)
 
+**Revert**  
+It is the tool to undo changes you have push to remote. Basically you specify those commits that need to be undone, git helps undo all changes introduced in those commits and make new commits for each with content rollback. So it helps you avoid undoing all changes manually.
+```sh
+# create 3 separate revert commits
+$ git revert a867b4af 25eee4ca 0766c053
+# use range
+$ git revert a867b4af..0766c053
+
+# easy to revert last 3 commits
+$ git revert HEAD~3
+
+# do not make commit for each, after this we can commit manually
+$ git revert --no-commit hash1 hash2
+```
+
 [Integrate change](https://www.atlassian.com/git/tutorials/merging-vs-rebasing)
 ---
 

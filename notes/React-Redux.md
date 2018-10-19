@@ -122,6 +122,7 @@ It's design concern to Find who need to act as container component which handles
 > Middleware provides some extension point between dispatching an action and the moment it reaches the reducer. It enhances 'dispatch' which is only for plain action object, allow you dispatch anything as long as there is middleware handles it
 
 ```js
+// suppose this is the first middleware to be applied
 function logger(store) {
   const chainedDispatch = store.dispatch;
   // this new fn will be assigned to original dispatch, it accept same parameters: 'action' object
@@ -134,10 +135,12 @@ function logger(store) {
   }
 }
 function reporter(store) {
-  // this could be 'enhanced' dispatch from previous applied middleware
+  // this is 'enhanced' dispatch from previous applied logger middleware
   const chainedDispatch = store.dispatch;
   return (action) => {
     // do other more stuff
+    
+    // chainedDispatch will do logging at this point
     chainedDispatch(action)
   }
 }

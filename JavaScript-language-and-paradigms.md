@@ -93,7 +93,6 @@ Student.prototype.show = function() {
 Student.prototype.otherMethod = function() {}
 ```
 
-
 ### Node Topics
 
 ☞ [ESM and CommonJS module ](https://hackernoon.com/node-js-tc-39-and-modules-a1118aecf95e)   
@@ -162,4 +161,161 @@ Generally multi-threads part is abstracted away, not exposed to developer. There
 - Built-in cluster  
 This allows to take advantage of multi-core in one machine. It works by spawning multiple node worker process to handle load.
 
-[Async Exception handling](https://github.com/mbeaudru/modern-js-cheatsheet/issues/54)
+---
+From this article: http://2ality.com/2016/10/async-function-tips.html  
+- The result of an async function is **always** a Promise p. That Promise is created when starting the execution of the async function.
+- The body is executed. Execution may finish permanently via return or throw (p is resolved with returned value or rejected with thrown error).
+- Or it may finish temporarily via await; in which case execution will usually continue later on. You can think of it like all code after await is wrapped magically in await then's callback, will be called async
+- The Promise p is returned immediately.
+```js
+async function asyncFunc() {
+    // resolve implicit p with 123
+    return 123;
+    // returning a Promise means that p from asyncFunc now mirrors
+    // the state of this new Promise
+    // return Promise.resolve(123);
+}
+asyncFunc().then(v => console.log(v)) // 123
+
+async function asyncFunc() {
+    throw new Error('Problem!')
+    // similar to this
+    // return Promise.reject(new Error('Problem!'));
+}
+asyncFunc().catch(e => console.log(e)) // Error: Problem!
+```
+`async` keyword will forward any async call inside it to be chained from outside
+```js
+async function asyncFunc() {
+    return anotherAsyncFunc();
+    // similar
+    // const value = await anotherAsyncFunc();
+    // return value;
+}
+asyncFunc().then(value => {
+  // get what's resolved from anotherAsyncFunc
+})
+```
+No need to always `await` if we don't want consume the resolved value (just fire async call and continue)
+```js
+async function asyncFunc() {
+    anotherAsyncFunc();
+    // continue will be logged immediately when asyncFunc returned
+    console.log('continue')
+}
+```
+`await` should be wrapped by a direct `async`, there is no such thing like closure,  
+```js
+async function downloadContent(urls) {
+    return urls.map(url => {
+        // Wrong syntax! No async in map callback
+        const content = await httpGet(url);
+        return content;
+    });
+}
+async function downloadContent(urls) {
+    // we cannot directly return map, as it's just sync call
+    // with an array of promise returned from each callback
+    const proms = urls.map(async (url) => {
+        // need to declare the map callback as async
+        const content = await httpGet(url);
+        return content;
+    });
+    await Promise.all(proms);
+    // or
+    // return Promise.all(m) ?
+}
+
+const contents = await downloadContent(urls);
+```
+[Async Exception handling](https://github.com/mbeaudru/modern-js-cheatsheet/issues/54)   
+We should avoid pass unnecessary callback pairs or try...catch every async call.
+As the major win from promise is able to propagate the error through chaining until it finds one handling it  
+We could catch in the middle of chaining if there is need, but do not just throw it again.
+```js
+ fetch('token_url')
+  .then(token => fetchPost(id, token), )
+  .then(post => JSON.parse(post))
+  .catch(e => {
+    // it can catch promise rejection and normal throw
+    // e will whatever exception raised from fetch token, fetchPost or JSON.parse
+    // the original error type and stack trace will be kept
+  })
+
+ // same as
+ try {
+   const token = await fetch('token_url');
+   const post = await fetchPost(id, token);
+   return JSON.parse(post)
+ } catch (e) {
+
+ }
+```
+
+[Debounce & Throttle](https://css-tricks.com/debouncing-throttling-explained-examples/)  
+These can be used as function execution frequency control, as we can not control how often Browser trigger an event, mousemove, scroll, input change etc.  
+```js
+function debounce(fn, delay) {
+  let timer;
+  return function() {
+    const context = this;
+    const args = arguments;
+    // if (timer)
+    clearTimeOut(timer);
+
+    timer = setTimeout(function() {
+      fn.apply(context, args);
+    }, delay);
+  }
+}
+```
+Debounce 'lift' analogy:  
+- The event is when there is people pushing button and getting in   
+- Event handler (callback) is lift moving floor (time consuming)   
+When there are many people trying to push button, instead of moving floor for each person, the lift is waiting, until no one is getting in after certain 'delay' elapsed, (here assume there is no limit for lift's capacity) then the actual callback is triggered, i.e start moving.  
+
+We need a wrapped function over the actual callback (moving floor), returned by debounce. This wrapped one will be attached to event. It will set timeout and sort of queue the actual callback. When the event is happening too often within the delay, the wrapped function will first clear previous timeout, (cancel queued callback), set a new timeout.
+
+Throttle:  
+> we don't allow the actual callback to execute more than once every X milliseconds.
+ The main difference between this and debouncing is that throttle guarantees the execution of the function **regularly**, at least every X milliseconds. Debounce only triggers execution when event stops (stop typing, scrolling, mouse moving etc.)
+
+```js
+function throttle(fn, threshold) {
+  let last
+  let timer
+  return function() {
+    const context = this;
+    const args = arguments;
+    const now = +new Date();
+    let remaining = last ? last + threshold - now : 0;
+    if (remaining > 0) {
+      clearTimeOut(timer);
+
+      timer = setTimeout(function() {
+        last = now;
+        fn.apply(context, args);
+      }, remaining);
+    }
+    else {
+      last = now;
+      fn.apply(context, args);
+    }
+  }
+}
+```
+If we look at 'lift' again, the lift will check if it passes the threshold since last time moving (callback triggered), if not, it will queue the callback  (with remaining timeout since last triggered), otherwise it will execute actual callback immediately, even there are still people trying to get in.
+
+Common pitfall is to execute debounce or throttle every time event gets triggered
+```js
+// wrong
+// this will never trigger handler just create the debounced fn every time
+input.on('change', function(e) {
+  debounce(handleChange, 300);
+})
+// right
+// we want debounced fn wrapping handleChange to be triggered every time input change
+// the event argument will be passed down to handleChange
+debouncedFn =  debounce(handleChange, 300);
+input.on('change', debouncedFn);
+```
