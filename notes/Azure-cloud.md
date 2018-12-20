@@ -89,12 +89,6 @@ The Mongo requirements for Parse Server are:
  ☑︎ Create db user and pin under the cluster, use them for real connection string    
  ☑︎ Enable SSL in cluster page -> Tools tab, possibly `failIndexKeyTooLong` in `Run database command`   
 
- ▻ **Azure dev server**   
- We can deploy server code to azure cloud for testing by pushing to remote git repo created by azure
- ```sh
- git remote add <remote name> https://<azure user>@mikserver-dev.scm.azurewebsites.net:443/mikserver-dev.git
- git push <remote name> master
- ```    
 
  ▻ **Azure prod deploy always based on `master` branch**
  ```sh

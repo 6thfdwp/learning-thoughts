@@ -2,7 +2,8 @@
 • [Composing config](https://survivejs.com/webpack/developing/composing-configuration/)  
 • [Proxy webpack dev server with existing express server](https://github.com/christianalfoni/webpack-express-boilerplate)  
 • [Client/Server webpack config](http://jlongster.com/Backend-Apps-with-Webpack--Part-II)   
-• [How Hot reloading born in React](https://medium.com/@dan_abramov/hot-reloading-in-react-1140438583bf)
+• [How Hot reloading born in React](https://medium.com/@dan_abramov/hot-reloading-in-react-1140438583bf)   
+• [Detailed break down of how webpack HMR works](https://medium.com/@rajaraodv/webpack-hot-module-replacement-hmr-e756a726a07)
 
 When bundled in `webpack-dev-server`, all builds are generated inside its dev server, served from memory (not in our project)  
 See `http://localhost:8080/webpack-dev-server`, including:  
@@ -13,6 +14,9 @@ See `http://localhost:8080/webpack-dev-server`, including:
  - [output].html from HTML plugin based on template file
 
 with proxy, we could access these in-memory bundles via `http://localhost:3000/build/[bundle]`, while still load other static resources like img properly served by our express server
+
+### Webpack confusing part
+
 
 ## § Webpack config
 
@@ -48,7 +52,8 @@ with proxy, we could access these in-memory bundles via `http://localhost:3000/b
 },
 ...
 ```
-Then create your own _custom.scss and use it to override the built-in custom variables, use main.scss to import them, and import `main.sass` from entry file
+
+Then create your own `_custom.scss` and use it to override the built-in custom variables, use main.scss to import them, and import `main.sass` from entry file
 ```js
 // main.sass
 @import "custom";
@@ -63,24 +68,6 @@ Could use `browserslist` in `package.json` config, specify what browsers need to
   'ie > 9'
 ]
 ...
-```
-**Multi entries and bundles**
-
-• [Truly multi entries](https://kuzzmi.com/blog/truly-multiple-entries-with-webpack/)
-
-
-```js
-entry: {
-  admin/index: './admin/main.js'
-  app1/index: './app1/main.js'
-},
-output: {
-  path: <build_path>
-  filename: '[name].bundle.js'
-},
-plugins: [
-  // HTMLWebpackPlugin for separate page to serve each bundle
-]
 ```
 
 **Server rendering**  

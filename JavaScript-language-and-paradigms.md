@@ -1,6 +1,4 @@
 
-☞ [10 concepts every JS dev should know](https://medium.com/javascript-scene/10-interview-questions-every-javascript-developer-should-know-6fa6bdf5ad95)
-
 **Two main programming paradigms**   
 - OOP: (via prototypal inheritance)   
   Straight forward, **imperative** set of operations to describe 'how'   
@@ -92,14 +90,14 @@ Student.prototype.show = function() {
 }
 Student.prototype.otherMethod = function() {}
 ```
-
+☞ [10 concepts every JS dev should know](https://medium.com/javascript-scene/10-interview-questions-every-javascript-developer-should-know-6fa6bdf5ad95)
 
 
 ---
 From this article: http://2ality.com/2016/10/async-function-tips.html  
 - The result of an async function is **always** a Promise p. That Promise is created when starting the execution of the async function.
 - The body is executed. Execution may finish permanently via return or throw (p is resolved with returned value or rejected with thrown error).
-- Or it may finish temporarily via await; in which case execution will usually continue later on. You can think of it like all code after await is wrapped magically in await then's callback, will be called async
+- Or it may finish temporarily via await; in which case execution will usually continue later on. You can think of it like all code after await is wrapped magically in await then's callback
 - The Promise p is returned immediately.
 ```js
 async function asyncFunc() {
@@ -208,7 +206,7 @@ Debounce 'lift' analogy:
 - Event handler (callback) is lift moving floor (time consuming)   
 When there are many people trying to push button, instead of moving floor for each person, the lift is waiting, until no one is getting in after certain 'delay' elapsed, (here assume there is no limit for lift's capacity) then the actual callback is triggered, i.e start moving.  
 
-We need a wrapped function over the actual callback (moving floor), returned by debounce. This wrapped one will be attached to event. It will set timeout and sort of queue the actual callback. When the event is happening too often within the delay, the wrapped function will first clear previous timeout, (cancel queued callback), set a new timeout.
+We need a wrapping function over the actual callback (moving floor), returned by debounce. This new wrapping fn will be attached to event. It will set timeout and sort of queue the actual callback. When the event is happening too often within the delay, the wrapping function will first clear previous timeout, (cancel queued callback), set a new timeout.
 
 Throttle:  
 > we don't allow the actual callback to execute more than once every X milliseconds.

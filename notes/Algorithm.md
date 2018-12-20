@@ -10,7 +10,7 @@ Linked: linked list, tree, graph (chunks of memory bound by pointer)
  - Simpler insertion and deletion  
  - O(n) to retrieve
 
-⍰ How to do dynamic array analysis amortised guarantee
+⍰ How to do dynamic array amortised analysis 
 
 Most algorithms operating on contiguous space (array, string etc) involve some
 iteration techniques:

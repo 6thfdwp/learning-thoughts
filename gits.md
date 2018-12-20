@@ -63,7 +63,7 @@ $ git push <remote> <branch> -f # force to remote if needed, be careful
 ```
 
 ◘ Rebase between master (release) and topic (dev)
-```
+```sh
 c means commit hash
 c1 <- c2 <- c3' <- c4'       [master]
        \    
