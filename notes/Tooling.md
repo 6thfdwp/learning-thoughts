@@ -225,8 +225,8 @@ plugins: [
 |     Original           | 1.4M  | 350K |    |
 |     Optimized plugins  | 1.38M | 347K (console did drop) |~17s |
 |     babel-preset-env   | 1.38M | 347K |~17s  |
-|  `Split bundle`        |
-|     vendor, main       |     |  |
-|   xxx                  |       |     |
+|  `Split libs bundle`        |
+|     vendor      |     |  |
+|     other             |       |     |
 
 ---
