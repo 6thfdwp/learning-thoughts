@@ -58,7 +58,7 @@ notice that the memory keeps growing after each request.
 
 
 ## Dive into Parse server
-```
+```sh
  npm start -- --appId xx --masterKey yy --databaseURI ..
  node ./bin/parse-server -> require('cli/parse-server')
 ```

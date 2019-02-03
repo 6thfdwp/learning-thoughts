@@ -26,8 +26,8 @@
       # import apiRoute from './apidata';
       index.js
 
-    # var routes = reuire('.routes')
-    app.js
+      # var routes = reuire('.routes')
+      app.js
  ########################################## end src
 
   # run webpack-dev-server programatically
@@ -134,9 +134,9 @@ Need to understand how it deals with `__dirname`. From [offical](https://webpack
 
 > true: The dirname of the **input** file relative to the context option.  
 
-The context is base directory, an absolute path for resolving entry points. It is default to current directory. If we have following directory structure:
+The context is base directory, an absolute path for resolving entry points. It is default to current working directory. If we have following directory structure:
 ```sh
-# root
+# project root
 - builds
   - dev
     server.bundle.js
@@ -158,7 +158,7 @@ If we set context as
   entry: ['./index.js']
 }
 ```
-The dirname would be `server/db`. We might not be able to read correct file.
+The dirname would be `server/db`. We might not be able to read files which needs correct absolute path.
 
 > false: The regular Node.js dirname behavior. The dirname of the **output** file when run in a Node.js environment.
 
