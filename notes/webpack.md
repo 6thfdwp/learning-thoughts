@@ -26,13 +26,13 @@
       # import apiRoute from './apidata';
       index.js
 
-      # var routes = reuire('.routes')
-      app.js
+    # top level module: require('.routes') and mount
+    app.js
  ########################################## end src
 
   # run webpack-dev-server programatically
   bundle.js
-  # entry file: import app from './src/app'
+  # webpack entry file: import app from './src/app'
   server.js
   # for client
   webpack.config.js
@@ -91,7 +91,7 @@ router.get(`${basename}/*`, (req, res) => {
 })
 ```
 
-#### Installation
+#### New setup: Installation
 ```js
 // latest babel-loader require scoped babel dependency: @babel/xxx not babel-xxx
 yarn add @babel/core babel-loader @babel/preset-env babel-preset-react
@@ -145,6 +145,9 @@ The context is base directory, an absolute path for resolving entry points. It i
   - server
     - db
       models.js
+    app.js
+    index.js
+
   - client
 
 webpack.config.js
@@ -163,3 +166,28 @@ The dirname would be `server/db`. We might not be able to read files which needs
 > false: The regular Node.js dirname behavior. The dirname of the **output** file when run in a Node.js environment.
 
 No matter where we use `__dirname`, it becomes the dir of bundle file `builds/dev`
+
+**HMR hook up**  
+Consider the `index.js` as webpack entry point, `app.js` returns an express instance where all routers and middlewares get mounted, can think of it as app's top level module.
+
+Every time webpack detects any file changes and recompiles, it will trigger a callback, we need to require the app there (the changed modules will be re-executed and loaded), also need to make new request handled by new required app . We do this by manually creating NodeJS http server and pass the app into it, instead of directly `app.listen` (which express does create server for you)
+```js
+const app = require('./server/app');
+
+let curApp = app;
+const server = http.createServer(app);
+server.listen(config.port, function() {
+  console.log(`api server running on ${config.port}`);
+});
+
+if (module.hot) {
+  // accept top module path and require it again
+  module.hot.accept('./server/app', () => {
+    const app = require('./server/app');
+    // important: use new app (which contains the changed code) to handle request
+    server.removeListener('request', curApp);
+    server.on('request', app);
+    curApp = app;
+  });
+}
+```
