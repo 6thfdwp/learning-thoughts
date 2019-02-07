@@ -11,8 +11,9 @@ take specifier (`express`) or relative path (`./util/time`) -> absolute path whi
 Take absolute path from **Resolving** phase, 'Read' the file content which path pointing to. (For js/JSON, just load the text source into memory, for native module, loading involve linking to Node.js process)
 
 **Wrapping**  
-Take file content from **Loading**, wrap them in a function before passing to JS VM to evaluation
-```js
+Take file content from **Loading**, wrap them in a function before passing to JS VM to evaluation. Those `module`, `exports`, and `__dirname` used in the module are not global but passed as parameters in the wrapper function.  
+This is major difference with ESM, CommonJS dynamically knows what a module exports only when this wrappers fn gets **evaluated**, not when it is **parsed**
+```jsav
 function (exports, require, module, __filename, __dirname) {
   // our module code
   // const express = require('express');
@@ -22,7 +23,7 @@ function (exports, require, module, __filename, __dirname) {
 ```
 
 **Evaluating**  
-It's this wrapped fn passed to JS VM evaluated, `exports, module` and variables defined in module are scoped, not truly global. Only when this wrapping fn evaluated, 'exports' object where all symbols attached on can be returned. (This is the result of `require` a module). It's the key difference from ESM, where CommonJS `exports` evaluated dynamically, ESM are defined lexically. In short, ESM exported symbols can be determined when JS parsing before actually evaluated.
+It's this wrapped fn passed to JS VM evaluated, `exports, module` and variables defined in module are scoped, not truly global. Only when this wrapping fn evaluated, 'exports' object where all symbols attached on can be returned. (This is the result of `require` a module).
 
 **Caching**  
 The returned object will be cached (the key is likely the absolute path of each module), so only first require will go through the whole phases, the subsequent will directly get the module exports.
