@@ -1,6 +1,6 @@
 [§ Scheme design](https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design-part-1)
 --
-```
+```sh
 • When prefer embedded objects and when not (many side contains hundreds of items, or
   each item on 'N' side need to be accessed and updated alone, this case use separate table)
 
@@ -27,10 +27,10 @@
 **Compound index keys order**  
 If we have index `status:-1, deliveryDate:-1, customer:1`:   
 It only support query whose key(s) are prefix of the indexed keys, i.e  
-```
+```sh
  ✓ status: 'CONFIRMED'  
  ✓ status: 'CONFIRMED' and deliveryDate: '20180928'
- 
+
  # the order does not matter as long as it has first key 'status', still prefix
  ✓ deliveryDate: '20180928' and status: 'CONFIRMED'
  ✓ status: 'CONFIRMED' and deliveryDate: '20180928' and customer: 'A'  

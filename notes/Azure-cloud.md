@@ -9,14 +9,12 @@ Upgrade node 6.6.0 -> 8.9.0, npm 4.3.0 -> 5.5.1
 npm install -g npm@xxx
 Update some deps and engines version in `package.json`  
 `npm i ` generate `package-lock.json`
-```
-```
-   ╭─────────────────────────────────────╮
-   │                                     │
-   │   Update available 5.5.1 → 5.6.0    │
-   │     Run npm i -g npm to update      │
-   │                                     │
-   ╰─────────────────────────────────────╯
+╭─────────────────────────────────────╮
+│                                     │
+│   Update available 5.5.1 → 5.6.0    │
+│     Run npm i -g npm to update      │
+│                                     │
+╰─────────────────────────────────────╯
 ```
 
 ‣ Spin up a new App Service in Azure
