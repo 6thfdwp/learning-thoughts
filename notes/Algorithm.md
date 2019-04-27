@@ -1,3 +1,5 @@
+https://www.interviewbit.com/courses/programming/
+
 ## Data structure
 Fundamentally (physically), all data structure could be categorised as two:
 
@@ -10,7 +12,7 @@ Linked: linked list, tree, graph (chunks of memory bound by pointer)
  - Simpler insertion and deletion  
  - O(n) to retrieve
 
-⍰ How to do dynamic array amortised analysis 
+⍰ How to do dynamic array amortised analysis
 
 Most algorithms operating on contiguous space (array, string etc) involve some
 iteration techniques:
@@ -95,7 +97,7 @@ def pop():
 
 **Priority Queue**   
 `heap` is one of efficient implementation for PQ, use an array to maintain partial order. One item dominates its children by having the smaller(min heap) than they do or bigger keys (max heap).   
-```
+```sh
           5
         /   \
        7    10   =>  5, 7, 10, 9, 15, 12
@@ -103,7 +105,7 @@ def pop():
   9   15  12
 ```
 We use a slick array to represent tree structure without storing pointers in each node. The parent and children for item at position k have been determined
-```
+```sh
 parent(k): return k/2
 left(k):   return 2k
 right(k):  return 2k+1  

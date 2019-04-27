@@ -137,4 +137,8 @@ db.Order.aggregate([
   {$out: "out"}
 ]);
 
+db.Order.aggregate([
+  $match:{_p_cateringOrder:{$exists: true}, status:{$ne: 'CANCELLED'}}, $group:{_id:null, total:{$sum: '$price'}}
+])
+
 ```
