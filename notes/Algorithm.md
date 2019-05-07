@@ -14,13 +14,18 @@ Linked: linked list, tree, graph (chunks of memory bound by pointer)
 
 ⍰ How to do dynamic array amortised analysis
 
+**Do iteration**  
 Most algorithms operating on contiguous space (array, string etc) involve some
 iteration techniques:
 - forward (from first to last), or backward
 ```py
-for i in xrange(reversed(len(A))):
+for i in reversed( xrange(len(A) ):
 # or using while
+while j > 0:
+  # do stuff
+  j -= 1
 ```
+
 - from two end to the middle
 ```py
 # check palindrome
@@ -33,6 +38,7 @@ while i < n/2:
   j = n - 1 - i
   A[i], A[j] = A[j], A[i]
 ```
+
 - from middle or some part of the array, expanding towards two ends
 ```py
 # longest sub-palindrome
@@ -41,7 +47,9 @@ def expand(i, j, A):
     i, j = i-1, j+1
   return A[i+1:j]
 ```
-- iterate two array at the same time, merge phase of merge sort
+
+- iterate two array at the same time   
+  merge phase of merge sort
 ```py
 # general form, need to deal with different size of arrays
 while i < len(A) or j < len(B):
@@ -52,8 +60,23 @@ while i < len(A) or j < len(B):
 
   # do both
   do(A[i], B[j])
+
+# find all appearing in two sorted arrays
+while i < ilen and j < jlen:
+  if A[i] < B[j]:
+    i += 1
+  elif A[i] > B[j]:
+    j += 1
+  else:
+    res.append(A[i])
+    i, j = i+1, j+1
 ```
-Keep two pointers is common, especially in-place operations required, e.g remove duplicates
+Keep two pointers (indices) is common, a few problems using this:  
+- Remove duplicates in place (sorted is easier, one pass)  
+  One for iteration, one for current non-dup item's index
+- 2sum in **Ordered** array  
+  Find 2 indices that adds up to given number. From two end, each time either increase left or decrease right
+
 
 
 **Stack & Queue**  
@@ -189,13 +212,12 @@ Binary search is important, and has some variances, e.g. in rotating sorted arra
 Binary search can be generalised beyond find the element in sorted array. As long as the search space is monotonic (increasing or decreasing in one direction). Or think in this way: we check element x in the search space against some predicate of the domain *f*:  
 if f(x) == true, elements that are in the **`right`** side (could means bigger) of x are also true, f(x+1) == true ..  
 if f(x) == false, elements that are in the **`left`** side (could means smaller) of x are also false, f(x-1) == false ..
-```
+
 Search space checked against some predicate looks like this:
 
-false false false false true  true true true
-          <-- |                | -->
-              x1               x2
-```
+false false false false(<-x1) true(x2->) true true true   
+
+
 
 ### § Recursion and Dynamic programming
 
