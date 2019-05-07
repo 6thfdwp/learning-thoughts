@@ -13,7 +13,7 @@ Take absolute path from **Resolving** phase, 'Read' the file content which path 
 **Wrapping**  
 Take file content from **Loading**, wrap them in a function before passing to JS VM to evaluation. Those `module`, `exports`, and `__dirname` used in the module are not global but passed as parameters in the wrapper function.  
 This is major difference with ESM, CommonJS dynamically knows what a module exports only when this wrappers fn gets **evaluated**, not when it is **parsed**
-```jsav
+```js
 function (exports, require, module, __filename, __dirname) {
   // our module code
   // const express = require('express');
@@ -31,7 +31,7 @@ The returned object will be cached (the key is likely the absolute path of each 
 
 #### [Async I/O and Event loop](https://blog.risingstack.com/node-js-at-scale-understanding-node-js-event-loop/)
 
-[Where NodeJS could fit](https://www.toptal.com/nodejs/why-the-hell-would-i-use-node-js) has good summary. Simply put: its non-blocking model suitable for handling large number of concurrent requests, most of them perform normal read/write ops that can be made async, but not for CPU intensive computation that will block the single call stack, hence event loop also gets blocked.
+[Where NodeJS could fit](https://www.toptal.com/nodejs/why-the-hell-would-i-use-node-js) has good summary. Simply put: its non-blocking model suitable for handling large number of concurrent requests, most of them perform normal read/write ops that can be made async, but not for CPU intensive computation that will block the single call stack, hence the event loop also gets blocked.
 
 **Single thread (call stack):**  
 refer to JS runtime (eg. V8, I think these things that implement ECMA specs), one call stack frame. NOTE heap is another data structure for object allocation, objects used in fn execution are only pointers pushed/popped in the call stack). Memory may still hold the object content after function returns if there is reference. Call stack is also what error stack trace print out when some errors raised.
@@ -65,3 +65,18 @@ array.forEach(i => do(i))
 Generally multi-threads part is abstracted away, not exposed to developer. There is `child_process` module to support spawning child process.
 - Built-in cluster  
 This allows to take advantage of multi-core in one machine. It works by spawning multiple node worker process to handle load.
+
+#### [Debugging tools](https://blog.risingstack.com/how-to-debug-nodej-js-with-the-best-tools-available/)
+
+**V8 Inspector Integration**   
+allows attaching Chrome DevTools to Node.js instances for debugging by using the Chrome Debugging Protocol
+
+```sh
+$ node --inspect-brk src/index.js
+# Debugger listening on ws://127.0.0.1:9229/831a2cc0-1cf9-4862-8702-2d497b7531d9
+```
+Open the Chrome
+```sh
+chrome-devtools://devtools/bundled/inspector.html?experiments=true&v8only=true&ws=127.0.0.1:9229/831a2cc0-1cf9-4862-8702-2d497b7531d9
+```
+We can see `debugger attached`, then we can use it like what we do in browser debugging.

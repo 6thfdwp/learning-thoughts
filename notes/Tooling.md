@@ -1,9 +1,8 @@
-• [Build your own starter](http://andrewhfarmer.com/build-your-own-starter/#0-intro)   
 • [Composing config](https://survivejs.com/webpack/developing/composing-configuration/)  
 • [Proxy webpack dev server with existing express server](https://github.com/christianalfoni/webpack-express-boilerplate)  
 • [Client/Server webpack config](http://jlongster.com/Backend-Apps-with-Webpack--Part-II)   
-• [How Hot reloading born in React](https://medium.com/@dan_abramov/hot-reloading-in-react-1140438583bf)   
-• [Detailed break down of how webpack HMR works](https://medium.com/@rajaraodv/webpack-hot-module-replacement-hmr-e756a726a07)
+• [Detailed break down of how webpack HMR works](https://medium.com/@rajaraodv/webpack-hot-module-replacement-hmr-e756a726a07)  
+• [Reduce bundle size](https://dev.to/goenning/how-we-reduced-our-initial-jscss-size-by-67-3ac0)
 
 When bundled in `webpack-dev-server`, all builds are generated inside its dev server, served from memory (not in our project)  
 See `http://localhost:8080/webpack-dev-server`, including:  
@@ -15,10 +14,8 @@ See `http://localhost:8080/webpack-dev-server`, including:
 
 with proxy, we could access these in-memory bundles via `http://localhost:3000/build/[bundle]`, while still load other static resources like img properly served by our express server
 
-### Webpack confusing part
 
-
-## § Webpack config
+### § Webpack config
 
 **[integrate Bootstrap@4 SASS flow](https://getbootstrap.com/docs/4.0/getting-started/webpack/#importing-precompiled-sass)**
 
@@ -59,7 +56,7 @@ Then create your own `_custom.scss` and use it to override the built-in custom v
 @import "custom";
 @import "bootstrap/scss/bootstrap";
 ```
-Could use `browserslist` in `package.json` config, specify what browsers need to be supported, babel, css processor (other transpiler babel as well) will only do compiling for targeted browsers
+Could use `browserslist` in `package.json` config, specify what browsers need to be supported, babel, css processor will only do compiling for targeted browsers
 ```js
 // package.json
 ...
@@ -118,7 +115,7 @@ if (process.env.prod) // true
 - `progress-bar-webpack-plugin`
 
 
-## § Prepare prod deploy
+### § Prepare prod deploy
 
 [• build script with npm](https://developer.atlassian.com/blog/2015/11/scripting-with-node/)
 
@@ -226,7 +223,7 @@ plugins: [
 |     Optimized plugins  | 1.38M | 347K (console did drop) |~17s |
 |     babel-preset-env   | 1.38M | 347K |~17s  |
 |  `Split libs bundle`        |
-|     vendor      |     |  |
+|     vendor chunks      |     |  |
 |     other             |       |     |
 
 ---
