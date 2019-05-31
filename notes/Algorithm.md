@@ -1,5 +1,3 @@
-https://www.interviewbit.com/courses/programming/
-
 ## Data structure
 Fundamentally (physically), all data structure could be categorised as two:
 
@@ -7,12 +5,12 @@ Fundamentally (physically), all data structure could be categorised as two:
 Contiguous: array, heaps, hash table  
  - O(1) index based retrieve    
  - Space efficiency, only data   
+⍰ For dynamic array. The amortised cost for appending is O(1), only a few items require O(N) to move to resized new array
 
 Linked: linked list, tree, graph (chunks of memory bound by pointer)  
  - Simpler insertion and deletion  
- - O(n) to retrieve
+ - O(n) to retrieve   
 
-⍰ How to do dynamic array amortised analysis
 
 **Do iteration**  
 Most algorithms operating on contiguous space (array, string etc) involve some
@@ -73,9 +71,14 @@ while i < ilen and j < jlen:
 ```
 Keep two pointers (indices) is common, a few problems using this:  
 - Remove duplicates in place (sorted is easier, one pass)  
-  One for iteration, one for current non-dup item's index
+  One for iteration i, one for current non-dup item's index j, so j+1 would be next placement for the another non-dup
 - 2sum in **Ordered** array  
   Find 2 indices that adds up to given number. From two end, each time either increase left or decrease right
+
+For the string problems, need to clarify before solving, here are a few common one to consider:   
+- Is it case sensitive,
+- How should we deal with special chars, `space`, `tab` etc
+- Is the string ASCII (256 char set) or unicode (2 bytes),
 
 
 
@@ -210,14 +213,13 @@ the range of keys, consider bucket sort when it is small range, e.g sort people 
 Binary search is important, and has some variances, e.g. in rotating sorted array, or sorted array with duplicates.
 
 Binary search can be generalised beyond find the element in sorted array. As long as the search space is monotonic (increasing or decreasing in one direction). Or think in this way: we check element x in the search space against some predicate of the domain *f*:  
-if f(x) == true, elements that are in the **`right`** side (could means bigger) of x are also true, f(x+1) == true ..  
-if f(x) == false, elements that are in the **`left`** side (could means smaller) of x are also false, f(x-1) == false ..
+if f(x2) == true, elements that are in the **`right`** side (could means bigger) of x2 are also true, f(x+1) == true ..  
+if f(x1) == false, elements that are in the **`left`** side (could means smaller) of x1 are also false, f(x-1) == false ..
 
 Search space checked against some predicate looks like this:
 
-false false false false(<-x1) true(x2->) true true true   
-
-
+`false false false false(<-x1) true(x2->) true true true`   
+With generalised approach, some problems can also be solved by BS, like find closest square root number for given x: `floor(sqrt(x))`
 
 ### § Recursion and Dynamic programming
 
@@ -243,6 +245,7 @@ It ensures never visiting a state () twice, also guarantee all will be covered.
  010(2) -> 101 -> 110 (-2)
  011(3) -> 100 -> 101 (-3)
  ```
+
  **Common manipulation**  
  ```py
  # get the i-th (from right, least significant) bit of number n
@@ -275,6 +278,47 @@ It ensures never visiting a state () twice, also guarantee all will be covered.
    c = c >> 1 # c /= 2
  ```
 
+**Memory limits**   
+
+Bit vector can be used when the input size cannot fit in memory entirely. If using bool array or int array, it will take more space (4 bytes or so) to indicate each number's presence. (e.g int A[1000] = 1 A[1005] = 0). Need to be able to calculate the rough vector size based on available memory.
+
+Normally 4 bytes int would have `2^31` positive integers (up to billions)  
+`2^10`: 1 Kb, `2^20`: 1 Mb, `2^30`: 1 Gb (~10^9)   
+
+If we have 1Gb memory, 8 billion bits, enough to represent all integers   
+If we only have 10Mb, cannot use one vector to indicate all ints   
+
+We divide the ints into blocks (stored as int [], assume each has 4 bytes), array size (blocks) can be `2^23 (10M)/4 = 2^21` entries at most (should be less, otherwise no space for bit vector),      
+- 2^31 / range_size = blocks <= 2^21
+- 2^10 <= range_size <= 2^26   
+  10M = 2^23 * 2^3 = 2^26 bits (each indicate one int)
+
+ ```py
+ # if choose 2^20 (hundreds kb) as range size (the number of ints represented)
+ def find():
+   size = 2^31 / range_size
+   blocks = [0] * size
+   for each number in input:
+     blocks[number/range_size] += 1
+
+   if blocks[i] < range_size:
+     # If one block misses int, the counter < range_size,
+     # other blocks with duplicates, the counter > range_size   
+     start_range = i * range_size
+     end_range = start_range + range_size
+
+     # another pass of loop
+     # only allocate range_size vector for that block
+     bvsize = [0] * (range_size >> 3)
+     bv = bytearray(bvsize)
+     for each value in input:
+       if value >= start_range and value <= end_range:
+         v = value - start_range
+         idx, offset = v / 8, v % 8
+         bv[idx] |= 1 << offset
+
+    # finally check bv, return number corresponding to any bit 0
+ ```
 
 ### System design
  For those general system design questions, like design Youtube, Twitter etc. It is broad, generally there are some common aspects to talk for any live product:
@@ -298,3 +342,5 @@ It ensures never visiting a state () twice, also guarantee all will be covered.
 - Security  
 
 It can be also focused on specific features on a particular products, e.g recommendation, timeline  
+
+https://www.interviewbit.com/courses/programming/
