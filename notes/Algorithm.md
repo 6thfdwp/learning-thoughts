@@ -5,7 +5,7 @@ Fundamentally (physically), all data structure could be categorised as two:
 Contiguous: array, heaps, hash table  
  - O(1) index based retrieve    
  - Space efficiency, only data   
-⍰ For dynamic array. The amortised cost for appending is O(1), only a few items require O(N) to move to resized new array
+⍰ For dynamic array. The amortised cost for appending is O(1), only a few items require O(N) to move old items to resized new array
 
 Linked: linked list, tree, graph (chunks of memory bound by pointer)  
  - Simpler insertion and deletion  
@@ -75,7 +75,7 @@ Keep two pointers (indices) is common, a few problems using this:
 - 2sum in **Ordered** array  
   Find 2 indices that adds up to given number. From two end, each time either increase left or decrease right
 
-For the string problems, need to clarify before solving, here are a few common one to consider:   
+For the string problems, need to clarify before solving, here are a few common ones to consider:   
 - Is it case sensitive,
 - How should we deal with special chars, `space`, `tab` etc
 - Is the string ASCII (256 char set) or unicode (2 bytes),
@@ -96,18 +96,28 @@ def push(item):
 
 def pop():
   # current top will be overwritten next push
+  if _top == -1:
+    return None
   item = _array[_top]
   _top -= 1
   return item
 
+def peek():
+  if _top == -1:
+    return None
+  return _array[_top]
+
+
 # linked list for stack
-top = None # also head pointer updated in every op
+# head pointer that's updated in every op
+# all we care is just about the top node that support O(1) insert and remove
+top = None
 def push(item):
   t = new Node()
   if not top:
     top = t
     return
-  # push from front for O(1)
+  # insert from front for O(1)
   t.next = top
   top = t
 
@@ -120,9 +130,14 @@ def pop():
 
 # Queue will use two pointers to track, as it needs to do op from two ends
 ```
+The stack is useful when doing backtrack in the recursion. You put the temporary result in the stack, when current level of recursion finishes or fails (not meet the requirement), pop one item from stack, go back to previous level. So every level of call stack will have right state associated.
+
+Another use of stack is to change recursive procedure to iteration. e.g BST in (pre) order traversal. Stack can used to store the nodes that need to be processed later. Like in-order traversal, we push nodes until reach to left-most leaf node, and pop one to continue.
+
+Queue is most commonly used in BFS, For each node, keep adding adjacent items to the queue
 
 **Priority Queue**   
-`heap` is one of efficient implementation for PQ, use an array to maintain partial order. One item dominates its children by having the smaller(min heap) than they do or bigger keys (max heap).   
+`heap` is one of efficient implementation for PQ, use an array to maintain partial order. One item dominates its children by having the smaller key (min heap) than itself or bigger key (max heap).   
 ```sh
           5
         /   \
@@ -130,15 +145,24 @@ def pop():
     /  \   /
   9   15  12
 ```
-We use a slick array to represent tree structure without storing pointers in each node. The parent and children for item at position k have been determined
+We use a slick array to represent tree structure without storing pointers in each node. The parent and children for item at position k can be determined
 ```sh
 parent(k): return k/2
 left(k):   return 2k
 right(k):  return 2k+1  
 ```
+Heap can also be implemented with binary tree, but take more space as need to store two pointers.
 
-`heap` is particular suitable for:
-- The items in the queue frequently get updated (priority value), also inserted, deleted, still be able to retrieve min/max item efficiently
+The common ops in `heap`:
+- insert: O(logN)  
+  Insert to the right most position to keep tree complete, bubble up to the right position
+
+- extract min/max: O(logN)  
+  Return the root node value (or the first el), rebuild the heap to maintain the property (swap the last leaf node to the top, bubble down to right position)
+
+- retrieve min/max: O(1)
+
+As `heap` maintaining the priority (either descending or ascending) efficiently, it is used as core data structure in BFS for shortest path  
 
 
 #### § Dictionary
@@ -161,6 +185,9 @@ Use an array of **`m`** linked list, If keys are evenly distributed, we have **`
 
  - Is a new document duplicate with a large corpus    
  - Is a new document plagiarized from a document in large corpus   
+
+#### § Tree & Graph
+Tree can be seen as connected graph (every node can be reached) without cycle, as one node can only have one parent.
 
 **Binary Search Tree (BST)**   
 This potentially (depend on how balanced it is) allows fast search and efficient update. Unlike unsorted linked list only for fast update or sorted array only for quick binary search.  
