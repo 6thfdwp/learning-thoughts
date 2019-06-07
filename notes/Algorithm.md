@@ -13,8 +13,8 @@ Linked: linked list, tree, graph (chunks of memory bound by pointer)
 
 
 **Do iteration**  
-Most algorithms operating on contiguous space (array, string etc) involve some
-iteration techniques:
+Most algorithms operating on contiguous space (array, string etc) involve some common iteration techniques:
+
 - forward (from first to last), or backward
 ```py
 for i in reversed( xrange(len(A) ):
@@ -35,6 +35,7 @@ while i < j:
 while i < n/2:
   j = n - 1 - i
   A[i], A[j] = A[j], A[i]
+  i += 1
 ```
 
 - from middle or some part of the array, expanding towards two ends
