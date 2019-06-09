@@ -70,7 +70,7 @@ while i < ilen and j < jlen:
     res.append(A[i])
     i, j = i+1, j+1
 ```
-Keep two pointers (indices) is common, a few problems using this:  
+Keep two pointers (indices) is common, e.g,
 - Remove duplicates in place (sorted is easier, one pass)  
   One for iteration i, one for current non-dup item's index j, so j+1 would be next placement for the another non-dup
 - 2sum in **Ordered** array  
@@ -170,10 +170,10 @@ As `heap` maintaining the priority (either descending or ascending) efficiently,
 It is an abstract data type that allow accessing item by given key (like associated array). Good dict implementation would achieve about O(1) retrieval by key, also aim to support efficient insert and delete.   
 
 **Hash table**   
-Hash function maps keys into large integers, mod by `m` which is number of slots of hash table. The result `int` is index where we store the actual data. When two keys are mapped into same integers, causing collision.   
+Hash function maps keys into large integers, mod by `m` which is number of slots of hash table. The result integer is index where we store the actual data. When two keys are mapped into same integers, causing collision.   
 
 *Collision by chaining*   
-Use an array of **`m`** linked list, If keys are evenly distributed, we have **`m`** close to **`n`** (total number of items), list in each 'slot' contains just about 1 item. The search is O(1) to locate bucket, and linear search through linked list      
+Use an array of **`m`** linked lists, If keys are evenly distributed, we have **`m`** close to **`n`** (total number of items), list in each 'slot' contains just a few items. The search is O(1) to locate bucket, and linear search through linked list      
  **?** How to choose `m`, reasonably large prime number
 
 *Collision by open addressing*   
@@ -181,8 +181,7 @@ Use an array of **`m`** linked list, If keys are evenly distributed, we have **`
 ☞ Problems nicely solved by hash:   
  - Substring pattern match (Rabin-Karp)   
  `n = |S|` length of original string,  `m = |p|` length of pattern string   
- `n - m + 1` windows hashing of s, 1 hashing of p, total *O(n-m+2)* hash computation. The next window hash H(S, j+1) can be based on previous one H(S, j)
-
+ `n - m + 1` windows hashing of S, 1 hashing of p, total *O(n-m+2)* hash computation. The next window hash H(S, j+1) can be based on previous one H(S, j)
 
  - Is a new document duplicate with a large corpus    
  - Is a new document plagiarized from a document in large corpus   
@@ -203,12 +202,25 @@ This potentially (depend on how balanced it is) allows fast search and efficient
  ```
  Change process order, would yield pre / post order traversal
 
- ⍰ How to make tree close to perfect balance `O(lgN)`
+ ⍰ How to make tree close to balance `O(logN)`
 
+**Graph traversal**
 
- ### § Sorting and Searching
+- BFS  
+  It uses queue to control the visiting order for graph nodes, also a visited `set` to efficiently check if a node has been explored (all its connections have been checked)
 
-For algorithm  analysis with Big(O), we could have following:
+  BFS on unweighted graph from s -> d yields the shortest path (the minimal hops) between s and d
+
+  Time: `O(V + E)`, V = number of nodes, since every node and edge will be explored in worst. O(1) < |E| < O(V^2) depends on how dense the graph is. V + E means whichever dominates. If it is very dense, E dominates, hence Time: O(V^2)
+
+- Dijkstra non-negative weight   
+  It is an enhanced BFS.
+
+  Depends on structure we used to maintain a list of nodes that will be extracted next based on weight, also update their existing weight.
+
+### § Sorting and Searching
+
+For algorithm  analysis with Big(O), we have the following formula:
 
 ```O(n!) > 2^n > n^3 > n^2 > nlog(n) > n > log(n)```   
 - n! and 2^n do not have practical use case in real.
@@ -219,7 +231,7 @@ For algorithm  analysis with Big(O), we could have following:
 - How many items?  
 If it's more than hundreds, consider `nlog(n)`, e.g heapsort, quicksort, mergesort
 - Duplicate keys?  
-Do we need stable sort, i.e same keys remain original position before sorted
+Do we need stable sort, i.e same keys remain original relative position before sorted
 
 - What do we know about Data   
 partially sorted: `insertion sort` would be better   
@@ -228,13 +240,21 @@ the range of keys, consider bucket sort when it is small range, e.g sort people 
 
 - Do we need external sort?
 
- merge sort by divide and conquer  
- quick sort by randomization   
+Short comparisons for a few sorting algorithms:
 
- heap sort via specific data structure   
- This is actually the selection sort on top of priority queue (implemented as heap). The data structure helps to extract min (find and delete) from the rest of items in log(n)
+- merge sort by divide and conquer
 
- distribution sort by bucketing
+  Divide is recursive procedure to continue halving the array until only one item,  
+  Conquer is to walk back the recursion, merge two parts in each level
+
+- quick sort by randomization   
+  Randomly choose one item, find its right position, so its left ones are all smaller and right ones are all bigger
+
+- heap sort via specific data structure
+
+  This is actually the selection sort on top of priority queue (implemented as heap). The data structure helps to extract min (find and delete) from the rest of items in log(N)
+
+distribution sort by bucketing
 
 **Search Consideration**   
 
@@ -260,7 +280,7 @@ Solve base case (size 1 or 2), build up solution to get full result, e.g Fibonac
 Binary search and merge sort, each recursion or iteration reduces problem size to half.  
 
 **Backtracking**  
-Backtracking is suitable for problems like enumerating all possibility. It naturally yields a traversal tree, each node is partial solution, the edge is constructed by adding new valid candidate (could be multiple candidates) from current node,  essentially work like `DFS` on an implicit graph.   
+Backtracking is suitable for problems like enumerating all possibility. It naturally yields a traversal tree, each node is partial solution, the edge is constructed by adding new valid candidate (could be multiple candidates) to current node,  essentially work like `DFS` on an implicit graph.   
 It ensures never visiting a state () twice, also guarantee all will be covered.
 
 
