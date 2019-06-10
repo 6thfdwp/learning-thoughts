@@ -1,3 +1,15 @@
+
+### Schedule
+```sh
+✓ Stack     DP, recursive
+✓ Hash      BFS, DFS
+✓ Tree      Binary
+- Heap      Bit
+- Trie
+
+System design / Interview experience
+```
+
 ## Data structure
 Fundamentally (physically), all data structure could be categorised as two:
 
@@ -5,7 +17,7 @@ Fundamentally (physically), all data structure could be categorised as two:
 Contiguous: array, heaps, hash table  
  - O(1) index based retrieve    
  - Space efficiency, only data   
-⍰ For dynamic array. The amortised cost for appending is O(1), only a few items require O(N) to move old items to resized new array
+   ⍰ For dynamic array. The amortised cost for appending is O(1), only a few items require O(N) to move old items to resized new array
 
 Linked: linked list, tree, graph (chunks of memory bound by pointer)  
  - Simpler insertion and deletion  
@@ -144,7 +156,7 @@ Queue is most commonly used in BFS, For each node, keep adding adjacent items to
         /   \
        7    10   =>  5, 7, 10, 9, 15, 12
     /  \   /
-  9   15  12
+   9   15  12
 ```
 We use a slick array to represent tree structure without storing pointers in each node. The parent and children for item at position k can be determined
 ```sh
