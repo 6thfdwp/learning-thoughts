@@ -145,7 +145,7 @@ def pop():
 ```
 The stack is useful when doing backtrack in the recursion. You put the temporary result in the stack, when current level of recursion finishes or fails (not meet the requirement), pop one item from stack, go back to previous level. So every level of call stack will have right state associated.
 
-Another use of stack is to change recursive procedure to iteration. e.g BST in (pre) order traversal. Stack can used to store the nodes that need to be processed later. Like in-order traversal, we push nodes until reach to left-most leaf node, and pop one to continue.
+Another use of stack is to change recursive procedure to iteration. e.g BST in (pre, post) order traversal. Stack can used to store the nodes that need to be processed later. Like in-order traversal, we push nodes until reach to left-most leaf node, and pop one to continue.
 
 Queue is most commonly used in BFS, For each node, keep adding adjacent items to the queue
 
@@ -212,11 +212,15 @@ This potentially (depend on how balanced it is) allows fast search and efficient
    process(node)
    inorder(node.right)
  ```
- Change process order, would yield pre / post order traversal
+Change process order, would yield pre / post order traversal. We can see different traversals are just using DFS in left and right subtree of a node interleaved with processing current node.
+
+When doing recursion, the leaf node can be seen as subtree without left and right parts. When it tries to go deeper, the procedure directly returns doing nothing. So this is where we reach the recursion base case, start going back.
 
  ⍰ How to make tree close to balance `O(logN)`
 
 **Graph traversal**
+- DFS  
+  It uses recursion or (stack) to traverse. Typical use case is topological sort to check if it is valid DAG, which is commonly used to represent the tasks depending on each other or some prerequisites. The search tree generated from DFS shows the correct order needed to finish tasks. If there is `back edge` means there is cycle, hence invalid DAG.
 
 - BFS  
   It uses queue to control the visiting order for graph nodes, also a visited `set` to efficiently check if a node has been explored (all its connections have been checked)
@@ -226,9 +230,11 @@ This potentially (depend on how balanced it is) allows fast search and efficient
   Time: `O(V + E)`, V = number of nodes, since every node and edge will be explored in worst. O(1) < |E| < O(V^2) depends on how dense the graph is. V + E means whichever dominates. If it is very dense, E dominates, hence Time: O(V^2)
 
 - Dijkstra non-negative weight   
-  It is an enhanced BFS.
+  It is an enhanced BFS. Each node put in the Q will be associated with some value, (could be price, cost, time, traffic volume etc). The processing order for Q is based on the current min / max value. These value also gets updated (relaxed) if node is still in the Q (explored but not check its neighbours yet) when there is another optimal path found which yields better than current cost.
 
-  Depends on structure we used to maintain a list of nodes that will be extracted next based on weight, also update their existing weight.
+  So need an efficient structure to constantly extract min/max node. When the node's value gets updated, it will also re-organise for next extraction.
+
+  Depends on structure we used to maintain a list of nodes that will be extracted. It has different complexity.
 
 ### § Sorting and Searching
 
