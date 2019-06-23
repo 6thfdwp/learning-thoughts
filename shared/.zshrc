@@ -53,9 +53,11 @@ plugins=(git history-substring-search)
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export ANDROID_HOME=~/Library/Android/sdk
 export MONGODB_HOME=~/Dev/mongodb-3.2.5
+# using brew install ipython@5, the python becomes /usr/local/bin/python
+# which points to /usr/local/Cellar/python@2/2.7.16
 export PYTHON_HOME=~/Library/Python/2.7
 export PHP_HOME=/Applications/MAMP/bin/php/php5.6.32
-export PATH=$PHP_HOME/bin:$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$MONGODB_HOME/bin:$PYTHON_HOME/bin
+export PATH=/usr/local/opt/ipython@5/bin:$PHP_HOME/bin:$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$MONGODB_HOME/bin:$PYTHON_HOME/bin
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
