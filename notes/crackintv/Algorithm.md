@@ -290,12 +290,19 @@ With generalised approach, some problems can also be solved by BS, like find clo
 ### § Recursion and Dynamic programming
 
 **Bottome up**  
-Solve base case (size 1 or 2), build up solution to get full result, e.g Fibonacci. Recursive version of Fibonacci is top down fashion.
+Solve base case (size 1 or 2), build up solution to get full result, e.g Fibonacci. Iterative Fibonacci is one example.
 
 **Top down**   
-[DP explained](www.quora.com/Are-there-any-good-resources-or-tutorials-for-dynamic-programming-DP-besides-the-TopCoder-tutorial/answer/Michal-Danilák)
+[DP explained](www.quora.com/Are-there-any-good-resources-or-tutorials-for-dynamic-programming-DP-besides-the-TopCoder-tutorial/answer/Michal-Danilák)  
+When using DP to come up with the sub-problems patterns, we start thinking with top-down fashion. Normally it is denoted as recurrent formula.  
+A few steps to follow:
+- Identify the sub-problem,
+- Clearly express it as a recurrent formula, F(i) = F(i-1) + F(i-2)  
+  we also decide the necessary parameters (minimal state space)
+- Identify the overlapping  
+  add memoization (cache result to directly use when given same input parameters)
 
-When using DP to come up with the sub-problems patterns, we start thinking with top-down fashion.
+Both bottom up and top down needs memoization to cache previous result from sub-problem. Bottom up is similar to recursive thinking, but implement in reverse.
 
 **Half-Half**  
 Binary search and merge sort, each recursion or iteration reduces problem size to half.  
