@@ -296,11 +296,13 @@ Solve base case (size 1 or 2), build up solution to get full result, e.g Fibonac
 [DP explained](www.quora.com/Are-there-any-good-resources-or-tutorials-for-dynamic-programming-DP-besides-the-TopCoder-tutorial/answer/Michal-Danilák)  
 When using DP to come up with the sub-problems patterns, we start thinking with top-down fashion. Normally it is denoted as recurrent formula.  
 A few steps to follow:
-- Identify the sub-problem,
+- Identify the sub-problem
+  It is easy to evaluate those small sized problem to get sub-optimal (local or current) result
 - Clearly express it as a recurrent formula, F(i) = F(i-1) + F(i-2)  
   We also decide the necessary parameters (minimal state space), this also used to determine the complexity as it indicates number of calls that can be made with different parameter combinations.
 - Identify the overlapping  
-  add memoization (cache result to directly use when given same input parameters). Mostly array (1 or 2 dimensions depends on number of parameters) to store partial result
+  add memoization (cache result to directly use when given same input parameters). Mostly array (1 or 2 dimensions depends on number of parameters) to store partial result  
+  Some problems may not have clear recurrent pattern and there is no overlapping. They can be reasoned from small sized problem to quickly get local result. These result can be used when growing the problem size until the global optimal value 
 
 This usually converts an exponential alg to square or cubic complexity. e.g give the problem size N and recurrent formula:   
 F(s, e) = max(F(s+1, e) + year * A[s], F(s, e-1) + year * A[e]),
@@ -368,8 +370,8 @@ Normally 4 bytes int would have `2^31` positive integers (up to billions)
 `2^10`:  1024,  ( ~10^3 thousand),  1 Kb, x bytes if every item is represented as 1b  
 `2^16`:  65536,  64K  
 `2^20`:  1048576 (~10^6 million)    1 Mb,   
-`2^30`:          (~10^9 billion)  1 Gb
-`2^32`  ~4 billions
+`2^30`:          (~10^9 billion)  1 Gb  
+`2^32`  ~4 billions (the typical long int range)
 
 If we have 1Gb memory, 8 billion bits, enough to represent all integers   
 If we only have 10Mb, cannot use one vector to indicate all ints. The idea is to first identify which range the missing int falls into   
