@@ -298,11 +298,16 @@ When using DP to come up with the sub-problems patterns, we start thinking with 
 A few steps to follow:
 - Identify the sub-problem,
 - Clearly express it as a recurrent formula, F(i) = F(i-1) + F(i-2)  
-  we also decide the necessary parameters (minimal state space)
+  We also decide the necessary parameters (minimal state space), this also used to determine the complexity as it indicates number of calls that can be made with different parameter combinations.
 - Identify the overlapping  
-  add memoization (cache result to directly use when given same input parameters)
+  add memoization (cache result to directly use when given same input parameters). Mostly array (1 or 2 dimensions depends on number of parameters) to store partial result
 
-Both bottom up and top down needs memoization to cache previous result from sub-problem. Bottom up is similar to recursive thinking, but implement in reverse.
+This usually converts an exponential alg to square or cubic complexity. e.g give the problem size N and recurrent formula:   
+F(s, e) = max(F(s+1, e) + year * A[s], F(s, e-1) + year * A[e]),
+each state could have 2 possible branches (two recursive calls)   
+Then without cache it is O(2^N). But we only have 2 variables, each can be N, total combination is bound to N^2. So the complexity should be bound to O(N^2) without repeatedly recursion.
+
+Both bottom up and top down needs memoization to cache previous result from sub-problem. Bottom up is similar to recursive thinking, but implement in reverse. Need the proper cached result anyway.
 
 **Half-Half**  
 Binary search and merge sort, each recursion or iteration reduces problem size to half.  
@@ -359,32 +364,46 @@ It ensures never visiting a state () twice, also guarantee all will be covered.
 Bit vector can be used when the input size cannot fit in memory entirely. If using bool array or int array, it will take more space (4 bytes or so) to indicate each number's presence. (e.g int A[1000] = 1 A[1005] = 0). Need to be able to calculate the rough vector size based on available memory.
 
 Normally 4 bytes int would have `2^31` positive integers (up to billions)  
-`2^10`: 1 Kb, `2^20`: 1 Mb, `2^30`: 1 Gb (~10^9)   
+
+`2^10`:  1024,  ( ~10^3 thousand),  1 Kb, x bytes if every item is represented as 1b  
+`2^16`:  65536,  64K  
+`2^20`:  1048576 (~10^6 million)    1 Mb,   
+`2^30`:          (~10^9 billion)  1 Gb
+`2^32`  ~4 billions
 
 If we have 1Gb memory, 8 billion bits, enough to represent all integers   
-If we only have 10Mb, cannot use one vector to indicate all ints   
+If we only have 10Mb, cannot use one vector to indicate all ints. The idea is to first identify which range the missing int falls into   
 
-We divide the ints into blocks (stored as int [], assume each has 4 bytes), array size (blocks) can be `2^23 (10M)/4 = 2^21` entries at most (should be less, otherwise no space for bit vector),      
-- 2^31 / range_size = blocks <= 2^21
-- 2^10 <= range_size <= 2^26   
-  10M = 2^23 * 2^3 = 2^26 bits (each indicate one int)
+We divide the ints into blocks (stored as int [], each block means one entry in the array, assume each takes 4 bytes), array size (number of blocks) can be `2^23 (10M)/4 = 2^21` entries at most (should be less, otherwise no space for bit vector),     
+Assume each entry represents number range
+- entries = 2^31 / number_range <= 2^21
+- 2^10 <= number_range <= 2^26   
+  upper bound is max bits we can fit in 10M = 2^23 * 2^3 = 2^26 bits (need each bit indicates one int) once we know which range the missing number falls into
 
  ```py
- # if choose 2^20 (hundreds kb) as range size (the number of ints represented)
+ # if choose 2^20 as number range (the number of ints represented by each entry)
+ # we have 2^11 entries (2 * 4 Kb for int [])
+ # 0 to (1 million-1) increment number at 0 block
+ # 1 million to (2 million-1) increment number at 1 block
+ # 2 million to (3 million-1) increment number at 1 block
  def find():
    size = 2^31 / range_size
-   blocks = [0] * size
+   blocks = [0] * size # number of entries in int []
    for each number in input:
      blocks[number/range_size] += 1
 
-   if blocks[i] < range_size:
-     # If one block misses int, the counter < range_size,
-     # other blocks with duplicates, the counter > range_size   
-     start_range = i * range_size
-     end_range = start_range + range_size
+   for each block:
+     if blocks[i] < range_size:
+       # If one block misses int, the counter < range_size,
+       # If no missing int, each block[i] == 1 million
+       # other blocks with duplicates, the counter > range_size   
+       start_range = i * range_size
+       end_range = start_range + range_size
 
      # another pass of loop
-     # only allocate range_size vector for that block
+     # only allocate range_size bit vector for that block
+     # 2^20 / 2^3: size of bv, 2^17 bytes ~= 128k
+     # with the previous int [], total memory S(128 Kb + 8 Kb)
      bvsize = [0] * (range_size >> 3)
      bv = bytearray(bvsize)
      for each value in input:
