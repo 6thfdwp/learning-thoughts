@@ -305,8 +305,8 @@ A few steps to follow:
   Some problems may not have clear recurrent pattern and there is no overlapping. They can be reasoned from small sized problem to quickly get local result. These result can be used when growing the problem size until the global optimal value
 
 This usually converts an exponential alg to square or cubic complexity. e.g give the problem size N and recurrent formula:   
-F(s, e) = max(F(s+1, e) + year * A[s], F(s, e-1) + year * A[e]),
-each state could have 2 possible branches (two recursive calls)   
+`F(s, e) = max(F(s+1, e)+year * A[s], F(s, e-1)+year * A[e])`  
+Each state could have 2 possible branches (two recursive calls)   
 Then without cache it is O(2^N). But we only have 2 variables, each can be N, total combination is bound to N^2. So the complexity should be bound to O(N^2) without repeatedly recursion.
 
 Both bottom up and top down needs memoization to cache previous result from sub-problem. Bottom up is similar to recursive thinking, but implement in reverse. Need the proper cached result anyway.
