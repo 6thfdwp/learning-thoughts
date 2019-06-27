@@ -296,13 +296,13 @@ Solve base case (size 1 or 2), build up solution to get full result, e.g Fibonac
 [DP explained](www.quora.com/Are-there-any-good-resources-or-tutorials-for-dynamic-programming-DP-besides-the-TopCoder-tutorial/answer/Michal-Danilák)  
 When using DP to come up with the sub-problems patterns, we start thinking with top-down fashion. Normally it is denoted as recurrent formula.  
 A few steps to follow:
-- Identify the sub-problem
+- Identify the sub-problem   
   It is easy to evaluate those small sized problem to get sub-optimal (local or current) result
 - Clearly express it as a recurrent formula, F(i) = F(i-1) + F(i-2)  
   We also decide the necessary parameters (minimal state space), this also used to determine the complexity as it indicates number of calls that can be made with different parameter combinations.
 - Identify the overlapping  
   add memoization (cache result to directly use when given same input parameters). Mostly array (1 or 2 dimensions depends on number of parameters) to store partial result  
-  Some problems may not have clear recurrent pattern and there is no overlapping. They can be reasoned from small sized problem to quickly get local result. These result can be used when growing the problem size until the global optimal value 
+  Some problems may not have clear recurrent pattern and there is no overlapping. They can be reasoned from small sized problem to quickly get local result. These result can be used when growing the problem size until the global optimal value
 
 This usually converts an exponential alg to square or cubic complexity. e.g give the problem size N and recurrent formula:   
 F(s, e) = max(F(s+1, e) + year * A[s], F(s, e-1) + year * A[e]),
