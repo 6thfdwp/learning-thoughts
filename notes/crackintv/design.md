@@ -13,8 +13,6 @@ It is hard to get started, some general approaches to follow:
 - Issues and trade-off
 
 
-
-
 //
 - Storage  
   How business data stored in e.g proper designed relational DB, how large blob files stored and served   

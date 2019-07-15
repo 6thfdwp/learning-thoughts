@@ -55,12 +55,14 @@ The final returned element object tree from StoryLike looks like this:
             {type:'TEXT_ELEMENT', props:{nodeValue: ${likes}, children:[]}}
             {type:'TEXT_ELEMENT', props:{nodeValue: 'likes', children:[]}}
           ]
-      }},
+        }
+      },
       {
         type:'a',
         props:{
           href:${url}, children:[type:'TEXT_ELEMENT',...]
-        }}
+        }
+      }
     ]}
 }
 
