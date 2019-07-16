@@ -190,7 +190,39 @@ const ref = React.createRef();
 Here is another use case for HOC, implemented as `render` callback, allow extra prop `ref` to be passed to child down the tree. Without it, the ref will not be passed.
 `withRouter` has similar way to pass extra route related props (location etc)
 
-## Performance
+### Effect Hooks
+`useEffect` is used to 'schedule' some callbacks to perform side effect, like API calls, set up subscription / timeout / event handler and manual DOM manipulation. Similar to `didMount`, `didUpdate` lifecycles, but there are some major differences:
+- The time it gets triggered   
+  React remembers each effect function for each render, execute them in order after committing changes to DOM and browser painting the screen. So it does not block browser from updating the screen.  
+  > Although useEffect is deferred until after the browser has painted, it’s guaranteed to fire before any new (next) renders. React will always flush a previous render’s effects before starting a new update.
+
+- Part of rendering result    
+  Each rendering creates a new effect function that captures `props` and `state` belong to that particular render. There is no difference between initial render and subsequent update.
+
+- Clean up  
+  The 'clean up' function from previous effect is triggered after React render and Browser painting.
+  ```js
+  function FriendStatus(props) {
+    useEffect(() => {
+      // ...
+      ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+      return () => {
+        ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+      };
+    });
+  }
+  ```
+  When friend id changed from 10 -> 20,
+  - React renders UI with new props {id: 20}
+  - React commits updates and Browser paints
+  - Clean up effect: unsubscribe(10)
+  - Effect applied subscribe(20)
+
+- Avoid effect re-run  
+  All props, state variables and inner functions in the component used by effect becomes effect's dependencies. It requires us to think clearly what triggers the effect running 
+
+
+### Performance
 `shouldComponentUpdate`: "Should component related UI need to be updated?"  
 If yes, we certainly need to perform reconciliation process: re-rendering on that component to generate new elements tree, diff it with previous and figure out DOM updates.  
 If no, we can skip the process from that component and its entire subtree.
@@ -213,6 +245,7 @@ Class component, stateless or stateful, could perform side effect, but only re-r
 https://building.calibreapp.com/debugging-react-performance-with-react-16-and-chrome-devtools-c90698a522ad
 
 ---
+
 ### Caveats
 ```
 Can't call setState (or forceUpdate) on an unmounted component,
