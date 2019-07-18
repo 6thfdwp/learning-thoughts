@@ -191,16 +191,17 @@ Here is another use case for HOC, implemented as `render` callback, allow extra 
 `withRouter` has similar way to pass extra route related props (location etc)
 
 ### Effect Hooks
-`useEffect` is used to 'schedule' some callbacks to perform side effect, like API calls, set up subscription / timeout / event handler and manual DOM manipulation. Similar to `didMount`, `didUpdate` lifecycles, but there are some major differences:
+`useEffect` is used to 'schedule' some callbacks to perform side effect, like API calls, set up subscription / timeout / event handler and manual DOM manipulation. We can think of applying effect as synchronisation between each React rendering. After each rendering or dependencies the effect relies on change, the effect function is able to synced with latest state and props. It might server similar purpose to `didMount`, `didUpdate` lifecycles, but very different in terms of underlying execution.
+
 - The time it gets triggered   
   React remembers each effect function for each render, execute them in order after committing changes to DOM and browser painting the screen. So it does not block browser from updating the screen.  
   > Although useEffect is deferred until after the browser has painted, it’s guaranteed to fire before any new (next) renders. React will always flush a previous render’s effects before starting a new update.
 
 - Part of rendering result    
-  Each rendering creates a new effect function that captures `props` and `state` belong to that particular render. There is no difference between initial render and subsequent update.
+  Each rendering creates a new effect function that captures `props` and `state` belong to that particular render (through JS closure) if it does not specify any in the dependency array. If empty array, effect always referencing the props and state variables from first render.
 
 - Clean up  
-  The 'clean up' function from previous effect is triggered after React render and Browser painting.
+  Same rule as running effect, the 'clean up' function from previous effect is triggered after React current rendering and Browser painting, and then apply new effect belongs to the current rendering.
   ```js
   function FriendStatus(props) {
     useEffect(() => {
@@ -209,7 +210,7 @@ Here is another use case for HOC, implemented as `render` callback, allow extra 
       return () => {
         ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
       };
-    });
+    }, [props.friend.id]);
   }
   ```
   When friend id changed from 10 -> 20,
@@ -218,9 +219,48 @@ Here is another use case for HOC, implemented as `render` callback, allow extra 
   - Clean up effect: unsubscribe(10)
   - Effect applied subscribe(20)
 
+  //
 - Avoid effect re-run  
-  All props, state variables and inner functions in the component used by effect becomes effect's dependencies. It requires us to think clearly what triggers the effect running 
+  All props, state variables and inner functions in the component used by effect becomes effect's dependencies. It requires us to think clearly what triggers the effect running, specify them clearly in the dependancy array.
 
+  If we want to only run effect and clean up once, blindly specify empty array to trick React could end up with some bugs.
+  ```js
+  function Counter() {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+      // interval callback always runs setCount(0 + 1)
+      // as it captures initial state count = 0
+      const id = setInterval(() => setCount(count + 1), 1000);
+      return () => clearInterval(id);
+    }, []);
+
+    return <span>{count}</span>
+  }
+  ```
+  One way to do is to useReducer to separate how state gets updated from effect. So effect does not rely on any state, it only triggers the intention to update through `dispatch`.
+  ```js
+  function Counter(props) {
+    const [state, dispatch] = useReducer(reducer, {count:0, step:1});
+    const reducer = (state, action) => {
+      const {count, step} = state;
+      switch (action.type) {
+        case 'tick':
+          return {count: count + step, step}
+        default:
+          return state;
+      }
+    }
+
+    useEffect(() => {
+      const id = setInterval(() => dispatch({type: 'tick'}), 1000);
+      return () => clearInterval(id);
+      // can omit dispatch, as it is not created between render,
+      // useReducer always returns the same dispatch function
+    }, [dispatch]);
+
+  }
+  ```
 
 ### Performance
 `shouldComponentUpdate`: "Should component related UI need to be updated?"  
