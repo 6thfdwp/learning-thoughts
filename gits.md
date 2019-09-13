@@ -16,24 +16,34 @@ Switching branches first changes the HEAD to point to the new commit, populates 
 [Undo changes](https://www.atlassian.com/git/tutorials/undoing-changes)
 ---
 **Reset**   
- Undo changes that haven't shared in public. It uses different options to manipulate tree, index and working area in a specific order
+Undo changes that haven't shared in public. It uses different options to manipulate tree, index and working area in a specific order
 
-1. Moving HEAD --soft   
-If HEAD is pointing to 'master' branch, it first makes 'master' point to the commit we specify
+Reset to `commit` we want, how git handles the changes included in the discarded commit (after the commit we are resetting to) depends on options:
 
-![git reset --soft](http://www.git-scm.com/images/reset/reset-soft.png)
+1. Moving HEAD `git reset --soft <commit>`
+   Only reset HEAD to the commit. like `git checkout <commit>`, but does not create detached head state. Changes stay in staging area.   
+   When you run `git status`, it will show changes to be commited
 
-2. Updating the Index --mixed  
-This flag continues to un-stage everything, making you roll back to what you have before ```git add``` and ```git commit```
-
-![git reset --mixed](http://www.git-scm.com/images/reset/reset-mixed.png)
+2. Updating the index `git reset [--mixed]  <commit>`
+   This is the default option. It will un-stage everything, making you roll back to what you have before ```git add``` and ```git commit```
 
 3. Update the working directory --hard
+   Continue to undo changes in the working directory. All changes will get LOST!
 
-![git reset --hard](http://git-scm.com/images/reset/reset-hard.png)
+```sh
+# assume we just did a merge commit from remote, now want to rollback to previous one
+
+# HEAD@{1} from git reflog
+# representing the last ops (which is commit we had before merging )
+# HEAD@ is pointer to a particular commit
+git reset --hard HEAD@{1}
+# same as
+git reset --hard HEAD^
+```
+
 
 **Revert**  
-It is the tool to undo changes you have push to remote. Basically you specify those commits that need to be undone, git helps undo all changes introduced in those commits and make new commits for each with content rollback. So it helps you avoid undoing all changes manually.
+It is the tool to undo changes you have pushed to remote. Basically you specify those commits that need to be undone, git helps undo all changes introduced in those commits and make new commits for each with content rollback. So it helps you avoid undoing all changes manually.
 ```sh
 # create 3 separate revert commits
 $ git revert a867b4af 25eee4ca 0766c053
@@ -63,7 +73,7 @@ $ git push <remote> <branch> -f # force to remote if needed, be careful
 ```
 
 ◘ Rebase between master (release) and topic (dev)
-```sh
+```
 c means commit hash
 c1 <- c2 <- c3' <- c4'       [master]
        \    
@@ -138,6 +148,19 @@ commit bad217911cb870b7b4fb849c6c7e97d6ed5e6528
 ```
 
 Then we do `git reset --hard HEAD@{7}`, moving tree head pointing to `b44c378`, update the index, un-stage all commits after it (those we rebased from), as like no commit added, finally update the working directory, give exactly what we have before rebasing.
+
+#### Inspect the history
+> commit history
+
+git log shows existing commits history, git reflog shows full ops history
+
+> file changes history (between lines)
+```sh
+git log -L 50,75: ./some/path/file.ext
+git blame -L 50, 57
+```
+
+---
 
 ```sh    
 # 1. new features
