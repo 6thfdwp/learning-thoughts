@@ -90,6 +90,35 @@ router.get(`${basename}/*`, (req, res) => {
   </StaticRouter>
 })
 ```
+#### Use Starter (Razzle)  
+- Add deps
+```sh
+yarn add razzle, after
+```
+
+- Adjust project (folder) structure  
+  Create a new `/src` folder, put all new source files here  
+```
+- build
+- public
+- src
+  - admin
+  - homesite
+  - server
+    //
+```
+
+- How to split bundles  
+  Each sub-app has own bundle to load. More on custom webpack config   
+
+- How to create page layout for different apps  
+  E.g home site need external assets, scripts for Google analytics etc.  
+  For public server rendered pages, how to share single doc layout passing title/meta from different page component
+
+- Separate builds   
+  run build:admin / run build:landingpage
+
+- Client side routing for site pages or not?
 
 #### New setup: Installation
 ```js
