@@ -5,7 +5,7 @@ It is hard to get started, some general approaches to follow:
 - Define the scope   
   Like MVP, what the core features we need for the system. So we know what to design for.
 - Draw high level key components  
-  Good to start storage, almost every system needs some kind of storage. So it is good point to start digging in a bit more. Based on scope, what are the tables and their relationship.  
+  Good to start storage, almost every system needs some kind of storage. So it is good entry to start digging in a bit more. Based on scope, what are the tables and their relationship.  
   What kind of API specs needed   
   What is the user flow look like
 - Pick one component to detailed design
