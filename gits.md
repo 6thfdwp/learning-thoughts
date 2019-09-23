@@ -33,8 +33,8 @@ Reset to `commit` we want, how git handles the changes included in the discarded
 ```sh
 # assume we just did a merge commit from remote, now want to rollback to previous one
 
-# HEAD@{1} from git reflog
-# representing the last ops (which is commit we had before merging )
+# HEAD@{0} is 'pull and merge'
+# HEAD@{1} is the commit we had before merging, that's where we want to reset to
 # HEAD@ is pointer to a particular commit
 git reset --hard HEAD@{1}
 # same as
