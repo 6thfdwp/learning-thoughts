@@ -98,15 +98,24 @@ yarn add razzle, after
 
 - Adjust project (folder) structure  
   Create a new `/src` folder, put all new source files here  
+  keep original relative relationship between client, (client) shared and shared folders
 ```
 - build
 - public
 - src
-  - admin
-  - homesite
+  - client
+    - admin
+    - homesite
+    ...
+    - shared
   - server
-    //
+  ...
+  - shared
 ```
+
+- Custom plugins to inject PARSE_CONFIG into client bundles
+
+- Update some of models/store modules CommonJS style 'module.exports'
 
 - How to split bundles  
   Each sub-app has own bundle to load. More on custom webpack config   
