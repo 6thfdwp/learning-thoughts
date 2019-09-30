@@ -98,7 +98,7 @@ yarn add razzle, after
 
 - Adjust project (folder) structure  
   Create a new `/src` folder, put all new source files here  
-  keep original relative relationship between client, (client) shared and shared folders
+  keep original folder relative relationship between client, (client) shared and shared folders,  all other folders inside one app should work fine,
 ```
 - build
 - public
@@ -106,28 +106,42 @@ yarn add razzle, after
   - client
     - admin
     - homesite
-    ...
+    - landingpage
     - shared
   - server
+    - router
+    - pagelayout
+    app.js
   ...
   - shared
+
+  index.js
+
+razzle.config.js
 ```
 
 - Custom plugins to inject PARSE_CONFIG into client bundles
+- Other runtime env (API keys etc.) can use `.env` in local dev
 
 - Update some of models/store modules CommonJS style 'module.exports'
-
-- How to split bundles  
-  Each sub-app has own bundle to load. More on custom webpack config   
 
 - How to create page layout for different apps  
   E.g home site need external assets, scripts for Google analytics etc.  
   For public server rendered pages, how to share single doc layout passing title/meta from different page component
 
-- Separate builds   
+- Custom each home site page title / meta head 
+- Client side routing for home site pages or not?  
+  >    
+
+- *How to create common chunks like vendor*  
+
+- *How to split bundles*  
+  Each sub-app has own bundle to load.
+
+- *Separate build command*   
   run build:admin / run build:landingpage
 
-- Client side routing for site pages or not?
+
 
 #### New setup: Installation
 ```js
