@@ -47,49 +47,6 @@ The whole project structure is shown above:
   Spin up express, mount routes and middlewares, start the app
 
 
-```js
-// routesmap.js
-const routes = {
-  '/': {path:'', component: HomePage, title:{}, meta: {}},
-  '/menu': {path:'/menu', component: MenuPage},
-  '/meet-chef': {path:'/meet-chef', component: MeetChefPage},
-}
-const routes = [
-  {path:'', component: HomePage, title:{}, meta: {desc:''}},
-  {path:'/menu', component: MenuPage, title: {}, },
-  {path:'/menu/:id', component: MenuDetailPage, title:{} },  
-  {path:'/meet-chef', component: MeetChefPage, title: {} }  
-]
-
-// SiteApp.js
-routeComps = routes.map(r => {
-  const {path, component, ...rest} = r;
-  const Page = (
-    <WrapPage PageComp={component} {...rest} > </WrapPage>
-  )
-  return (
-    <Route path={r.path} component={Page} />
-  )
-})
-
-SiteApp = () => {
-  <React.Fragment>
-    <NavBar />
-    <Switch>
-      <Route path={'/catering/stockholm'} component={} />
-    </Switch>
-  </React.Fragment>
-}
-
-// route/static.js
-const basename = '/catering/stockholm'
-router.get(`${basename}/*`, (req, res) => {
-  const url = req.url;
-  <StaticRouter location={url} context={} >
-
-  </StaticRouter>
-})
-```
 #### Use Starter (Razzle)  
 - Add deps
 ```sh
@@ -128,13 +85,16 @@ razzle.config.js
 - ✓ How to create page layout for different apps  
   E.g home site need external assets, scripts for Google analytics etc.  
   >
-  
+
 - Custom each home site page title / meta head
   For public server rendered pages, how to share single doc layout passing title/meta from different page component
 
 - Client side routing for home site pages or not?  
 
 > Module Path related     
+- `landingpage` router need to refer to `src/shared`
+
+> Miscs
 
 - *How to create common chunks like vendor*  
 
