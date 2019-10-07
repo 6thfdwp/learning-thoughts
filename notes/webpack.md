@@ -119,19 +119,22 @@ yarn add razzle, after
 
 razzle.config.js
 ```
-
-- Custom plugins to inject PARSE_CONFIG into client bundles
+- React / React DOM, React Router upgrade  
+- ✓ Custom plugins to inject PARSE_CONFIG into client bundles
 - Other runtime env (API keys etc.) can use `.env` in local dev
 
-- Update some of models/store modules CommonJS style 'module.exports'
+- ✓ Update some of models/store modules CommonJS style 'module.exports'
 
-- How to create page layout for different apps  
+- ✓ How to create page layout for different apps  
   E.g home site need external assets, scripts for Google analytics etc.  
+  >
+  
+- Custom each home site page title / meta head
   For public server rendered pages, how to share single doc layout passing title/meta from different page component
 
-- Custom each home site page title / meta head 
 - Client side routing for home site pages or not?  
-  >    
+
+> Module Path related     
 
 - *How to create common chunks like vendor*  
 
@@ -139,6 +142,7 @@ razzle.config.js
   Each sub-app has own bundle to load.
 
 - *Separate build command*   
+  maybe not needed
   run build:admin / run build:landingpage
 
 
