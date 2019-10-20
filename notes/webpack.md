@@ -38,16 +38,62 @@
   webpack.config.js
   webpack.server.config.js
 ```
-The whole project structure is shown above:   
-
-**• server.js:**  
-  In dev, set up webpack-dev-server programatically for client app bundling, also handle HMR for sever side code
-
-**• app.js:**  
-  Spin up express, mount routes and middlewares, start the app
-
 
 #### Use Starter (Razzle)  
+Razzle with After has some custom points for server rendering the html layout and provide the initial data and extra props
+
+> after.render
+
+Invoked in express router
+```js
+const html = await render({
+  req,
+  res,
+  routes,
+  assets,
+  // Anything else you add here will be made available
+  // within getInitialProps(ctx)
+  // e.g a redux store...
+  customThing: 'thing',
+});
+res.send(html);
+
+// can also provide custom Doc and renderer
+const client = createApolloClient({ 'ssrMode': true });
+// need to return {html, ...otherProps}
+// otherProps will passed into Document rendering
+const customRenderer = node => {
+  const App = <ApolloProvider client={client}>{node}</ApolloProvider>;
+  return getDataFromTree(App).then(() => {
+    const initialApolloState = client.extract();
+    const html = renderToString(App);
+    return { html, initialApolloState };
+  });
+};
+const html = await render({
+  req,
+  res,
+  routes,
+  assets,
+  customRenderer,
+  Document: MyDocLayout,
+});
+```
+
+> Document.getInitialProps
+
+`renderPage` passed as callback, can be invoked with another callback to modify page component structure
+```js
+// If you were using something like styled-components,
+// and you need to wrap you entire app with some sort of additional provider or function
+static async getInitialProps({ assets, data, renderPage }) {
+  const sheet = new ServerStyleSheet()
+  const page = await renderPage(App => props => sheet.collectStyles(<App {...props} />))
+  const styleTags = sheet.getStyleElement()
+  return { assets, data, ...page, styleTags};
+}
+```
+
 - Add deps
 ```sh
 yarn add razzle, after
@@ -68,9 +114,11 @@ yarn add razzle, after
   - server
     - router
     - pagelayout
-    app.js
+
+    server.js
+    index.js
   ...
-  - shared
+  - shared (Store/Model/Constant)
 
   index.js
 
@@ -87,12 +135,13 @@ razzle.config.js
   >
 
 - Custom each home site page title / meta head
-  For public server rendered pages, how to share single doc layout passing title/meta from different page component
+  For public server rendered pages, how to share single doc layout passing title/meta from different page component  
+  Use react-helmet
 
 - Client side routing for home site pages or not?  
 
 > Module Path related     
-- `landingpage` router need to refer to `src/shared`
+- `landingpage` router () need to refer to `src/shared`
 
 > Miscs
 
