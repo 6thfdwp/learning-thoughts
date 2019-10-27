@@ -124,11 +124,14 @@ yarn add razzle, after
 
 razzle.config.js
 ```
-- React / React DOM, React Router upgrade  
+- ✓ React / React DOM, React Router upgrade  
+  - react@^16.9.0
+  - react-dom@^16.9.0
+  - react-router-dom@4.3.1 which contain same version react-router
+  - jaredpalmer/after: "^1.3.1",
+
 - ✓ Custom plugins to inject PARSE_CONFIG into client bundles
 - Other runtime env (API keys etc.) can use `.env` in local dev
-
-- ✓ Update some of models/store modules CommonJS style 'module.exports'
 
 - ✓ How to create page layout for different apps  
   E.g home site need external assets, scripts for Google analytics etc.  
@@ -140,14 +143,18 @@ razzle.config.js
 
 - Client side routing for home site pages or not?  
 
-> Module Path related     
+
+>  Update    
+- Move `homesite` in the client folders, add `main.js` and `Routes.js`
 - `landingpage` router () need to refer to `src/shared`
+- models/store modules CommonJS style
+- `gmail/addon`
 
 > Miscs
 
-- *How to create common chunks like vendor*  
+- ✓*How to create common chunks like vendor*  
 
-- *How to split bundles*  
+- ✓*How to split bundles*  
   Each sub-app has own bundle to load.
 
 - *Separate build command*   

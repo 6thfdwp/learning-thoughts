@@ -44,7 +44,26 @@ Will affect Kudu cli which handles deployment script, means some native builds (
 
 CONCLUSION: Specify same version on both, so runtime and deployment build env are the same
 
-### Upgrade parse-server@3.0.0
+## Use Yarn 
+- [Custom NodeJS deployment](https://blog.lifeishao.com/2017/03/24/custom-nodejs-deployment-on-azure-web-app/) 
+- https://github.com/stefangordon/kudu-yarn/issues/1
+
+```sh
+:: 3. Install Yarn
+echo Verifying Yarn Install.
+call :ExecuteCmd !NPM_CMD! install yarn -g
+SET PATH=%PATH%;D:\local\AppData\npm
+
+:: 4. Install Yarn packages
+echo Installing Yarn Packages.
+IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
+  pushd "%DEPLOYMENT_TARGET%"
+  call :ExecuteCmd yarn install --production
+  IF !ERRORLEVEL! NEQ 0 goto error
+  popd
+)
+```
+## Upgrade parse-server@3.0.0
  - [ ] require node (npm could also be upgraded, optional)
  - [ ] npm install parse-server@3.0
 
