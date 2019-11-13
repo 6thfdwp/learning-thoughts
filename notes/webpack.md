@@ -58,6 +58,14 @@ static async getInitialProps({ assets, data, renderPage }) {
 
 ### Project structure
 
+Replace `pacakge.json`
+
+```sh
+rm yarn.lock package-lock.json
+rm -rf node_modules
+npm install or yarn
+```
+
 Create a new `/src` folder, put all new source files here  
  keep original folder relative relationship between client, (client) shared and shared folders, all other folders inside one app should work fine,
 
@@ -101,14 +109,15 @@ razzle.config.js
 
 - Custom each home site page title / meta head
   For public server rendered pages, how to share single doc layout passing title/meta from different page component  
-  Use react-helmet
+  ~~Use react-helmet~~  
+  Still use old HomeLayout and staticsite router for server rendering`
 
 - Client side routing for home site pages or not?
 
 > Update
 
 - Move `homesite` in the client folders, add `main.js` and `Routes.js`
-  - Routes.js to define render props to wrap PageComponent
+  - Routes.js to define render props to wrap PageComponent for client side mounting
   - main.js need other legacy script
 - Move `<RequestForm />` into each page component
   - Julbord and Fotografiska need extra pageName
