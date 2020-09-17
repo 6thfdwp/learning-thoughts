@@ -32,7 +32,9 @@ The returned object will be cached (the key is likely the absolute path of each 
 
 #### [Async I/O and Event loop](https://blog.risingstack.com/node-js-at-scale-understanding-node-js-event-loop/)
 
-[Where NodeJS could fit](https://www.toptal.com/nodejs/why-the-hell-would-i-use-node-js) has good summary. Simply put: its non-blocking model suitable for handling large number of concurrent requests, most of them perform normal read/write ops that can be made async, but not for CPU intensive computation that will block the single call stack, hence the event loop also gets blocked.
+[Where NodeJS could fit](https://www.toptal.com/nodejs/why-the-hell-would-i-use-node-js) has good summary. Simply put: its non-blocking model suitable for handling large number of concurrent requests, most of them perform normal read/write ops that can be made async, but not for CPU intensive computation that will block the single call stack, hence the event loop also gets blocked.  
+
+![nodejs event loop](../assets/nodejs-event-loop.png)
 
 **Single thread (call stack):**  
 refer to JS runtime (eg. V8, I think these things that implement ECMA specs), one call stack frame. NOTE heap is another data structure for object allocation, objects used in fn execution are only pointers pushed/popped in the call stack). Memory may still hold the object content after function returns if there is reference. Call stack is also what error stack trace print out when some errors raised.
@@ -72,7 +74,8 @@ Generally multi-threads part is abstracted away, not exposed to developer. There
 
 #### [Debugging tools](https://blog.risingstack.com/how-to-debug-nodej-js-with-the-best-tools-available/)
 
-**V8 Inspector Integration**  
+> V8 Inspector Integration
+   
 allows attaching Chrome DevTools to Node.js instances for debugging by using the Chrome Debugging Protocol
 
 ```sh

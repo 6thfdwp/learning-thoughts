@@ -66,11 +66,11 @@ Let's have some examples to see how index affects query plan.
 ```js
 {status:'CONFIRMED', sortby: {deliveryDate: 1}}
 ```
-|   |totalKeysExamined | totalDocsExamined  | nReturned | sort in memory|
-| :---: | :-------------: |:-------------:|:-----:|   :-----:   |
-|no index|     0   | 344 | 113 | Y|
-|deliveryDate_1|     344   | 344 | 113 | N |
-|status_1_deliveryDate_1|     113   | 113 | 113 | N |
+|                         | totalKeysExamined | totalDocsExamined | nReturned | sort in memory |
+| :---------------------: | :---------------: | :---------------: | :-------: | :------------: |
+|        no index         |         0         |        344        |    113    |       Y        |
+|     deliveryDate_1      |        344        |        344        |    113    |       N        |
+| status_1_deliveryDate_1 |        113        |        113        |    113    |       N        |
 
 We can see with only `deliveryDate_1` index, db still has to do full scan docs (344) to return matched result which are `status: 'CONFIRMED'`, and then do another index scan (344) to only select those doc references existing in previous matched result and directly produce sorted result. In this case no need to sort again.
 ```js
@@ -79,10 +79,10 @@ We can see with only `deliveryDate_1` index, db still has to do full scan docs (
   sortby: {deliveryDate: 1}
 }
 ```
-|   |totalKeysExamined | totalDocsExamined  | nReturned | sort in memory|
-| :---: | :-------------: |:-------------:|:-----:|   :-----:   |
-|no index|     0   | 351 | 58 | |
-|status_1_deliveryDate_1|     351   | 351 | 58 | N |
+|                         | totalKeysExamined | totalDocsExamined | nReturned | sort in memory |
+| :---------------------: | :---------------: | :---------------: | :-------: | :------------: |
+|        no index         |         0         |        351        |    58     |                |
+| status_1_deliveryDate_1 |        351        |        351        |    58     |       N        |
 
 We can see 'not equal' can not make use of index too much.
 
@@ -90,10 +90,10 @@ We can see 'not equal' can not make use of index too much.
 ```js
 {_p_cateringOrder: 'CateringOrder$SdFzECO4ry'}
 ```
-|   |totalKeysExamined | totalDocsExamined  | nReturned | sort in memory|
-| :---: | :-------------: |:-------------:|:-----:|   :-----:   |
-|no index|     0   | 967 | 5 | |
-|_p_cateringOrder_1|     5   | 5 | 5 |  |
+|                    | totalKeysExamined | totalDocsExamined | nReturned | sort in memory |
+| :----------------: | :---------------: | :---------------: | :-------: | :------------: |
+|      no index      |         0         |        967        |     5     |                |
+| _p_cateringOrder_1 |         5         |         5         |     5     |                |
 
 With single index, it gains best query performance. The # of docs scanned equals to what returned.   
 ⍰ How it achieved only scanning 5 keys (equals to # of returned)
@@ -114,7 +114,7 @@ db.FoodOffer.explain('executionStats')
 > mongo <domain>:<port>/db -u <user> -p <> --eval "printjson(db.Offer.find({days:'Thu',available:true}).explain() )"  >> out.json
 
 > mongoexport -h <host> -d <db> -c Order -u <user> -p <password> -o <output> --type=csv -q '{_created_at:{$gt: { "$date": "2017-01-01T00:00:00.001Z"} }}' -f "<fields>"
-# export json
+# export **json**
 mongoexport -h <host> -d <db> -c <collection> -u <user> -p <password> -o out.json
 ```
 Run aggregation pipeline
