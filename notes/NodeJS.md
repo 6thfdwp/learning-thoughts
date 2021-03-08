@@ -30,40 +30,8 @@ It's this wrapped fn passed to JS VM evaluated, `exports, module` and variables 
 **Caching**  
 The returned object will be cached (the key is likely the absolute path of each module), so only first require will go through the whole phases, the subsequent will directly get the module exports.
 
-#### [Async I/O and Event loop](https://blog.risingstack.com/node-js-at-scale-understanding-node-js-event-loop/)
 
-[Where NodeJS could fit](https://www.toptal.com/nodejs/why-the-hell-would-i-use-node-js) has good summary. Simply put: its non-blocking model suitable for handling large number of concurrent requests, most of them perform normal read/write ops that can be made async, but not for CPU intensive computation that will block the single call stack, hence the event loop also gets blocked.  
 
-![nodejs event loop](../assets/nodejs-event-loop.png)
-
-**Single thread (call stack):**  
-refer to JS runtime (eg. V8, I think these things that implement ECMA specs), one call stack frame. NOTE heap is another data structure for object allocation, objects used in fn execution are only pointers pushed/popped in the call stack). Memory may still hold the object content after function returns if there is reference. Call stack is also what error stack trace print out when some errors raised.
-
-**Concurrency**:  
-Even JS runtime is single thread, the native side is multi threads. JS is able to call browser or C++ API (if in Node) to make long running operations run concurrently without blocking the call stack.
-
-**Task Queue:**
-It's where callback listeners stay. When JS calls native API, (setTimeout, http.get, readFile etc.) it actually send operations to background threads, also attach listeners. After operations finish, the callback listeners get into the task queue.
-
-We actually have more than one queue: macro-tasks and micro-tasks... As said, exact one macro task should be processed in one cycle of event loop, after this, all available micro tasks should be processed within one cycle
-
-**Event loop:**
-Check call stack, if it's empty, pick up the first (oldest) task from Task Queue, push to call stack to execute if it is empty (e.g process response / file content / query result). This happens like infinite fashion, hence loop.  
-This model is something the embedder (who use the JS engine, like browser or NodeJS) needs to implement. But V8 has the default implementation that can be overridden.
-
-```js
-while (queue.waitForMessage()) {
-  queue.processNextMessage();
-}
-```
-
-Note, the callback doesn't have to be async
-
-```js
-// the 'do' executed in sync way, if the do take long time,
-// it will block the call stack
-array.forEach(i => do(i))
-```
 
 #### [Scaling]()
 
