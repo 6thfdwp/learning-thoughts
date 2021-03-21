@@ -28,7 +28,7 @@ StoryLike = ({ likes, url, name }) => (
     <a href={url}>{name}</a>
   </li>
 );
-```
+``` 
 
 We use JSX `<StoryLike />` to easily compose the hierarchy, which essentially get transpiled via Babel to `createElement` call, it will recursively check component hierarchy, transform to nested `createElement` call for each node
 
