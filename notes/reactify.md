@@ -1,50 +1,3 @@
-This learning starts from inspiring series of blog posts [Didact: DIY your own React](https://engineering.hexacta.com/didact-learning-how-react-works-by-building-it-from-scratch-51007984e5c5)
-
-There are 3 main things we want to touch (in React code base, these are related to 3 separate packages):
-
-**React core**  
-It only contains the minimal interfaces to define component. Nothing related to reconciliation and platform specific code.
-
-**Renderer**  
-This manages how to transform React tree to platform specific calls. Different renderers use the same React base.  
-ReactDOM turns it to imperative, mutative calls to DOM API (appendChild, createTextNode..), ReactNative turns it into a single JSON message that lists mutations [['createView', attrs], ['manageChildren',] ...]
-
-**Reconciler**  
-This manages to generate next snapshot of UI based on latest state, also able to diff and figure out the minimal updates (platform calls) the Renderer needs to take.
-
-This mini implementation for learning only focuses on createElement, support Component and simple setState to trigger re-render (no transaction, no lifecycle). No renderer, the platform calls are embedded in reconciler. No various performance optimisation (where React invest a lot), no 'key' comparison for children.  
-The main focus is on the reconciler, demonstrating the core algorithm to transform the element object tree (as input) to another internal representation.
-Fiber implementation also shows the simple scheduling and different traversal strategy.
-
-Before diving into..
-
-React.Element is light weight object representation of actual UI (DOM in web)  
-Component is the definition to return the Element.
-
-```js
-StoryLike = ({ likes, url, name }) => (
-  <li className="row">
-    <button onClick={handler}>{likes}❤️</button>
-    <a href={url}>{name}</a>
-  </li>
-);
-``` 
-
-We use JSX `<StoryLike />` to easily compose the hierarchy, which essentially get transpiled via Babel to `createElement` call, it will recursively check component hierarchy, transform to nested `createElement` call for each node
-
-```js
-createElement(
-  // type
-  "li",
-  // props, will be null if no props
-  { className: "row" },
-  // children as the rest of parameters
-  createElement("button", { onClick: handler }, likes, "\u2764\uFE0F"),
-  createElement("a", { href: url }, name)
-);
-```
-
-The final returned element object tree from StoryLike looks like this:
 
 ```js
 {
@@ -70,63 +23,7 @@ The final returned element object tree from StoryLike looks like this:
       }
     ]}
 }
-
 ```
-
-### [Stack Reconciler](https://reactjs.org/docs/implementation-notes.html)
-
-This is the main reconciling algorithm before React 16. This reconciler mainly use recursion to walk through the entire element object tree, hence it would block browser UI and user interaction when walking takes long time.  
-Stack Reconciler relies on internal instance hierarchy which gets created by mounting original element object tree level by level, use this hierarchy to do updating (reuse node as possible)
-
-`createElement(type, props, ...rest)`:  
-generate element object tree representing UI snapshot. rest contains children nodes in each type level, each will be passed to `createElement` again recursively form sub tree
-
-`instantiate(element):`:
-
-```js
-// App.js
-render() {
-  <div >
-    <h1>{props.title}</h1>
-    <StoryLike story={story} />
-  </div>
-}
-```
-
-when `render(<App title='' />)`, the internal instance hierarchy end up like this:
-
-```
-CompositeComponent App
- > currentElement: {type: App(function), props:{title, children:[]}}
- > publicInstance: new App()
- > renderedComponent: DOMComponent
-   > currentElement: {type:"div", props:{children:[..]}}
-   > node: div
-   > renderedChildren: [
-     DOMComponent: {
-       > currentElement: {type:'h1'},
-       > node: h1
-       > renderedChildren: [DOMComponent]
-     CompositeComponent:
-       > currentElement: {type: StoryLike, props:{children:[]}}
-       > publicInstance: new StoryLike()
-       > renderedComponent: DOMComponent {
-         > currentElement {type:'li', ..}
-         > node: li
-         > renderedChildren: [
-           DOMComponent button,
-           DOMComponent a
-         ]
-   ]
-```
-
-### [Fiber reconciler](https://github.com/acdlite/react-fiber-architecture)
-
-We could also call it incremental reconciler. The traversing process (on element object tree) is split into chunks (a couple of fiber nodes each time) and spread it out over multiple call stack frames via `requestIdleCallback`. It is still kind of like recursive call but not on a single call stack (hence not blocking)
-
-The element object tree is incrementally transformed to fiber nodes linked together in parent → first child → sibling and back to parent fashion.
-
-The final commit phase is to actually update DOM, need to be done at once
 
 ## Advanced topics
 
