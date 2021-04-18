@@ -1,7 +1,9 @@
-[# Private fields filtering ](https://github.com/parse-community/parse-server/issues/3155) with [PR 3158](https://github.com/parse-community/parse-server/pull/3158)   
-[# 4672 File (image, pdf..) access control](https://github.com/parse-community/parse-server/issues/4672),   
+[# Private fields filtering ](https://github.com/parse-community/parse-server/issues/3155) with [PR 3158](https://github.com/parse-community/parse-server/pull/3158)  
+[# 4672 File (image, pdf..) access control](https://github.com/parse-community/parse-server/issues/4672),  
 [# 1023](https://github.com/parse-community/parse-server/issues/1023)
+
 > The deletion is working with the file URL without app ID. i.e.:
+
 ```sh
 # not working
 curl -X DELETE -H "X-Parse......" http://domain/parse/files/appid/file
@@ -9,62 +11,71 @@ curl -X DELETE -H "X-Parse......" http://domain/parse/files/appid/file
 curl -X DELETE -H X-Parse...... http://domain/parse/files/file
 ```
 
-[# Discussion parse server in cloud scale](https://github.com/parse-community/parse-server/issues/4278)   
-[# Discussion on perf](https://github.com/parse-community/parse-server/issues/2539)   
-[# Scale horizontally](https://github.com/parse-community/parse-server/issues/4564)    
+[# Discussion parse server in cloud scale](https://github.com/parse-community/parse-server/issues/4278)  
+[# Discussion on perf](https://github.com/parse-community/parse-server/issues/2539)  
+[# Scale horizontally](https://github.com/parse-community/parse-server/issues/4564)  
 [# Cache grows without prune](https://github.com/parse-community/parse-server/issues/4247)
 
 ```
+
 Startup a parse-server, without enableSingleSchemaCache
 use heapdump through require('heapdump') in your startup script
 notice that the memory keeps growing after each request.
 ```
 
 ## Contribute to Parse server
+
 ☞ [Git fork and PR flow](https://gist.github.com/Chaser324/ce0505fbed06b947d962)
 
- •  Go to original repo (e.g parse-server) to fork as your own   
- • `git clone https://github.com/YOUR-USERNAME/parse-server`   
- ```sh
- $ git remote add upstream https://github.com/UPSTREAM-USER/ORIGINAL-PROJECT.git
- # detailed remote with tracking info
- $ git remote -v show origin
+• Go to original repo (e.g parse-server) to fork as your own  
+ • `git clone https://github.com/YOUR-USERNAME/parse-server`
 
- $ git fetch upstream
- # make sure on local master of forked repo under our user
- $ git merge upstream/master
- $ git branch -va
+```sh
+$ git remote add upstream https://github.com/UPSTREAM-USER/ORIGINAL-PROJECT.git
+# detailed remote with tracking info
+$ git remote -v show origin
 
- $ git checkout -b new-feature
- # do all shit..
- # may need to integrate upstream changes before commit new-feature branch
- # then go to original repo to open a new PR, it will keep tracking the changes
- # on the local dev branch (new-feature) every time we push new commits to it
- ```
- #### Local dev
- If we need to use parse-server code we are currently working on,
- ```sh
- npm link parse-server path/to/cloned/repo
- npm install
- ```
+$ git fetch upstream
+# make sure on local master of forked repo under our user
+$ git merge upstream/master
+$ git branch -va
+
+$ git checkout -b new-feature
+# do all shit..
+# may need to integrate upstream changes before commit new-feature branch
+# then go to original repo to open a new PR, it will keep tracking the changes
+# on the local dev branch (new-feature) every time we push new commits to it
+```
+
+#### Local dev
+
+If we need to use parse-server code we are currently working on,
+
+```sh
+npm link parse-server path/to/cloned/repo
+npm install
+```
 
 ## [Security](http://docs.parseplatform.org/js/guide/#security)
+
 > Class-Level Permissions (CLPs) and Access Control Lists (ACLs) are both powerful tools for securing your app, but they don’t always interact exactly how you might expect. They actually represent two separate layers of security that each request has to pass through to return the correct information or make the intended change. **A request must pass through BOTH layers of checks in order to be authorised**. Note that despite acting similarly to ACLs, Pointer Permissions are a type of class level permission, so a request must pass the pointer permission check in order to pass the CLP check.
 
 • [Secure on class](http://blog.parseplatform.org/learn/secure-your-app-one-class-at-a-time/)
 
 • [Pointer CLP](http://blog.parseplatform.org/learn/secure-your-app-from-the-data-browser-with-pointer-permissions/)  
-  Act like virtual object level ACL but actually a type of CLP, i.e not associated with each object, it also follow CLP and ACL interaction. So recommend using it on objects that don't have many ACL set, (but it's easy to remove Pointer CLP later)
-
+ Act like virtual object level ACL but actually a type of CLP, i.e not associated with each object, it also follow CLP and ACL interaction. So recommend using it on objects that don't have many ACL set, (but it's easy to remove Pointer CLP later)
 
 ## Dive into Parse server
+
 ```sh
  npm start -- --appId xx --masterKey yy --databaseURI ..
  node ./bin/parse-server -> require('cli/parse-server')
 ```
-**§ ParseServer.constructor:**   
+
+**§ ParseServer.constructor:**
 
 The main thing here is to load all the controller instance, attach to config object. This config will be attached to `express` req (?), in router handler, we can easily access controller exposed methods (eventually calling into adapter), caller are able to be decoupled from specific adapter.
+
 ```js
 // ParseServer.js
 class ParseServer {
@@ -113,7 +124,9 @@ function getCacheController(options) {
   return new CacheController(cacheControllerAdapter, appId);
 }
 ```
+
 Controller mostly wrap methods adapters implement, but possibly add extra logic used during Rest read / write, also it is able to validate if proper adapter passed.
+
 ```js
 // Controllers/CacheController.js
 export class CacheController extends AdaptableController {
@@ -132,8 +145,8 @@ export class CacheController extends AdaptableController {
 }
 ```
 
-
 **§ ParseServer.start:**
+
 ```js
  // this.app serves Parse API endpoint (/classes, /functions..)
  // mount to https://<domain>/parse (default)
@@ -166,17 +179,23 @@ by calling each `expressRouter()` implementation
 - PublicAPIRouter
 - Promise based router (ClassesRouter, UsersRouter ..)
 
-For Promise based routers, each subclass router defines each type of sub-path to handler mapping, PromiseRouter do the control (mounting, executing..). Basically each subclass creation call PromiseRouter.constructor with each overriding `mountRoutes` method, e.g    
+For Promise based routers, each subclass router defines each type of sub-path to handler mapping, PromiseRouter do the control (mounting, executing..). Basically each subclass creation call PromiseRouter.constructor with each overriding `mountRoutes` method, e.g
+
 ```js
 // ClassesRouter.mountRoutes
 this.route('GET', '/classes/:className', (req) => {
   return this.handleFind(req);
 });
 // FunctionRouter
-this.route('POST', '/functions/:functionName', FunctionsRouter.handleCloudFunction);
+this.route(
+  'POST',
+  '/functions/:functionName',
+  FunctionsRouter.handleCloudFunction
+);
 ```
 
 We can see all routes config during app bootstrap
+
 ```
 [PromiseRouter.route]: GET /apps/:appId/verify_email
 [PromiseRouter.route]: POST /apps/:appId/resend_verification_email
@@ -197,7 +216,9 @@ We can see all routes config during app bootstrap
 [PromiseRouter.route]: GET /login
 [PromiseRouter.route]: POST /login
 ```
-In `PromiseRouter.expressRouter`, the actual mounting happens here, each sub router obtains `express.Router()` instance, and mount their routes:   
+
+In `PromiseRouter.expressRouter`, the actual mounting happens here, each sub router obtains `express.Router()` instance, and mount their routes:
+
 ```js
 // PromiseRouter
 expressRouter() {
@@ -213,14 +234,17 @@ mountOnTo(expressRouter) {
   return expressRouter;
 }
 ```
+
 Until now, we have api specific sub-routes mounted on express app, like what we normally do
+
 ```js
 const router1 = express.router();
 router1.get('/classes/:className', handler);
 
 const router2 = express.router();
-router.post('/functions/:functionName', handler)
+router.post('/functions/:functionName', handler);
 ```
+
 in `FunctionRouter`, we will look at how req get passed and how res get produced with proper decoding/encoding
 
 ```sh
@@ -233,12 +257,15 @@ in `FunctionRouter`, we will look at how req get passed and how res get produced
 express.Router (promised) -> RestQuery/Write -> config.database (controller) -> DatabaseAdapter (MongoStorageAdapter)
 
 Before executing rest query/write, it will check parse specific headers from applied middlewares
+
 ```js
 api.use(middlewares.allowCrossDomain);
 api.use(middlewares.allowMethodOverride);
 api.use(middlewares.handleParseHeaders);
 ```
-things like appId, sessionToken (if provided) will be checked, see if this is from valid client, also the user who made request has the access to read and write the data. For example:  
+
+things like appId, sessionToken (if provided) will be checked, see if this is from valid client, also the user who made request has the access to read and write the data. For example:
+
 ```js
 // in 'scr/middlewares.js'
 handleParseHeaders(req, res, next) {
@@ -303,14 +330,15 @@ handleParseHeaders(req, res, next) {
 
 rest.js, RestQuery/RestWrite
 
-`RestWrite` will do more when it's related to User, e.g third-party auth  
+`RestWrite` will do more when it's related to User, e.g third-party auth
+
 ```js
-RestWrite.handleAuthData   
-  -> this.config.authDataManager.getValidatorForProvider(provider)  
-  -> (Adapters/Auth/index) loadAuthAdapter  
+RestWrite.handleAuthData
+  -> this.config.authDataManager.getValidatorForProvider(provider)
+  -> (Adapters/Auth/index) loadAuthAdapter
   -> adapter.validateAuthData -> adapter.validateAppId()
 ```
 
-**§ ParseQuery transform**  
+**§ ParseQuery transform**
 
 `Adapters/Storage/Mongo/MongoTransform.js`
