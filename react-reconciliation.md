@@ -1,4 +1,4 @@
-This learning starts from inspiring series of blog posts [Didact: DIY your own React](https://engineering.hexacta.com/didact-learning-how-react-works-by-building-it-from-scratch-51007984e5c5), which has been updated in his [new blog post](https://pomb.us/build-your-own-react/) with Fiber and Hooks implementations (very simplified but core concept remains true).
+This learning starts from inspiring series of blog posts [Didact: DIY your own React](https://engineering.hexacta.com/didact-learning-how-react-works-by-building-it-from-scratch-51007984e5c5), which has been updated in his [new blog post](https://pomb.us/build-your-own-react/) with Fiber and Hooks implementations (drastically simplified but core concept remains true).
 
 From the [React codebase overview](https://reactjs.org/docs/codebase-overview.html), the React contains 3 main packages
 
@@ -7,13 +7,12 @@ From the [React codebase overview](https://reactjs.org/docs/codebase-overview.ht
 APIs necessary to define components. like `React.createElement()`
 
 **Reconcilers**  
-This manages to generate next snapshot of UI based on latest state, also be able to do diff and figure out the minimal updates (platform calls) the Renderer needs to take. It is more concerned with _what_ and _when_
+This manages to generate next snapshot of UI (represented by object tree) based on latest state, also be able to do diff and figure out the minimal updates (platform calls) the Renderer needs to take. It is more concerned with _what_ 
 
 **Renderers**
 
 > Renders manage how a React tree turns into underlying platform calls
-
-For example ReactDOM turns it to imperative, mutative calls to DOM API (appendChild, createTextNode..), ReactNative turns it into a single JSON message that lists mutations [['createView', attrs], ['manageChildren',] ...].
+> For example ReactDOM turns it to imperative, mutative calls to DOM API (appendChild, createTextNode..), ReactNative turns it into a single JSON message that lists mutations [['createView', attrs], ['manageChildren',] ...].
 
 With this kind of separation, It allows different renderers to handle platform specific while reusing the same React core and reconciling algorithms. **Renderers** is mainly to encapsulate the _how_ part.
 
@@ -22,7 +21,7 @@ My learning and experimental code repo are focused on **Reconciler** algorithm a
 ## React Element
 
 React.Element is light weight object representation of actual UI (e.g DOM in web)  
-Component is the definition to return the Element. It can compose other components to create complext UI structure.
+Component is the definition to return the Element. It can compose other components using HTML like syntax (JSX) to create complext UI structure.
 
 Let's say we have a list of stories (or any type of items), we can 'Like' each story and the number goes up. The component might look like this:
 
@@ -35,7 +34,7 @@ const StoryLike = ({ likes, url, name, onLike }) => (
 );
 ```
 
-Before actual running, Babel plugin will recursively check the component hierarchy and transpile each node to `createElement` call. For <StoryLike />, it will be like:
+Before actual running, Babel plugin will recursively check the JSX and transpile each node to `createElement` call. For <StoryLike />, it will be like:
 
 ```js
 createElement(
@@ -128,15 +127,14 @@ const StoryLike = ({story, onClick}) => {
 }
 ```
 
-When `render(<App title='Stack Reconciler' />)`, it recursively build the internal instance hierarchy corresponding to each level in the elemement object tree. There are two main types of instances for two types of element, one for primitive whose type is string (e.g div, li), one for custom component which has type 'function'
+When `render(<App title='Stack Reconciler' />)`, it recursively builds the internal instance hierarchy corresponding to each level in the elemement object tree. There are two main types of instances for two types of element, one for primitive whose type is string (e.g div, li), one for custom component which has type 'function'
 
 - CompositeComponent  
-  It is the instance wrapper for custom component (element.type is function), it mainly runs the the function body or `render` menthod to keep `unwrapping` the element object defined in it
+  It is the instance wrapper for custom component (element.type is function), it mainly runs the the function body or `render` menthod to keep *'unwrapping'* the element object defined in it
 - DOMComponent  
   It is the instance wrapper for primitive elements (type is `string`, h1, li etc). It mainly maintains the ref to DOM node, a list of children which could be other Composite/DOM internal instances
 
-The App recursive structure can be represented as below:
-
+The internal instance hierarchy can be represented as below:
 ```
 CompositeComponent App
  > currentElement: {type: App(function), props:{title, children:[]}}
@@ -149,7 +147,7 @@ CompositeComponent App
        > currentElement: {type:'h1'},
        > node: h1 --> 1.1
        > renderedChildren: [DOMComponent]
-     CompositeComponent:
+     CompositeComponent: StoryLike
        > currentElement: {type: StoryLike, props:{children:[]}}
        > publicInstance: new StoryLike()
        > renderedComponent: DOMComponent {
@@ -168,12 +166,13 @@ We could also call it incremental reconciler. It still needs to traverse the ele
 
 In this implementation, it demonstrates a simple scheduling to split traversal via `requestIdleCallback`. It's more like building a linked list incrementally. The element object tree is transformed to fiber nodes linked together in parent → first child → sibling and back to parent fashion.
 
-The final commit phase is to actually do DOM operation (place new node, update or deletion), which need to be done in one go.
+The same `render(<App title='Fiber Reconciler' />)` above, its reconciliation process can be visualised as below:
+![image](https://user-images.githubusercontent.com/2919741/115366261-81707100-a208-11eb-901d-9891347e6781.png)
 
-There are two main differences in new Fiber implementation
+From 1 to 17, it can be interrupted at any time based on the priorities or time is up for browser to draw current frame in the UI thread every 16.6ms (60fps frames per second, means 1000ms/60 = 16.6ms per frame) 
 
-1. There is Scheduler to interrupt Reconciler
-2. Reconciler and Renderer (DOM Ops) not interleaving when execution
+The final commit phase is to actually do DOM operation (place new nodes, update or deletion), which need to be done in one go, so user can see full content / style painted at once not in partial.
+
 
 ## Refs
 
@@ -181,3 +180,6 @@ There are two main differences in new Fiber implementation
 [Build your own React: simplified](https://pomb.us/build-your-own-react/)  
 [Under the hood: ReactJS](https://bogdan-lyashenko.github.io/Under-the-hood-ReactJS/)  
 https://react.iamkasong.com/preparation/idea.html
+
+**Video**  
+[Build a Custom React Renderer](https://www.youtube.com/watch?v=CGpMlWVcHok&list=PLPxbbTqCLbGHPxZpw4xj_Wwg8-fdNxJRh&index=7)
