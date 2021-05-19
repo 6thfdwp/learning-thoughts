@@ -13,14 +13,14 @@ System design / Interview experience
 ## Data structure
 Fundamentally (physically), all data structure could be categorised as two:
 
-**Contiguous** vs **Linked**  
-Contiguous: array, heaps, hash table  
- - O(1) index based retrieve    
+### Contiguous vs Linked  
+**Contiguous**: array, heaps, hash table  
+ - O(1) index based retrieval    
  - Space efficiency, only data   
    ⍰ For dynamic array. The amortised cost for appending is O(1), only a few items require O(N) to move old items to resized new array
 
-Linked: linked list, tree, graph (chunks of memory bound by pointer)  
- - Simpler insertion and deletion  
+**Linked**: linked list, tree, graph (different chunks of memory bound by pointer)  
+ - Efficient insertion and deletion  
  - O(n) to retrieve   
 
 
@@ -93,9 +93,7 @@ For the string problems, need to clarify before solving, here are a few common o
 - How should we deal with special chars, `space`, `tab` etc
 - Is the string ASCII (256 char set) or unicode (2 bytes),
 
-
-
-**Stack & Queue**  
+### Stack & Queue
 can be implemented with either array or linked list.
 ```py
 # array for stack
@@ -149,7 +147,7 @@ Another use of stack is to change recursive procedure to iteration. e.g BST in (
 
 Queue is most commonly used in BFS, For each node, keep adding adjacent items to the queue
 
-**Priority Queue**   
+### Priority Queue
 `heap` is one of efficient implementation for PQ, use an array to maintain partial order. One item dominates its children by having the smaller key (min heap) than itself or bigger key (max heap).   
 ```sh
           5
@@ -178,7 +176,7 @@ The common ops in `heap`:
 As `heap` maintaining the priority (either descending or ascending) efficiently, it is used as core data structure in BFS for shortest path  
 
 
-#### § Dictionary
+### § Dictionary
 It is an abstract data type that allow accessing item by given key (like associated array). Good dict implementation would achieve about O(1) retrieval by key, also aim to support efficient insert and delete.   
 
 **Hash table**   
@@ -198,7 +196,7 @@ Use an array of **`m`** linked lists, If keys are evenly distributed, we have **
  - Is a new document duplicate with a large corpus    
  - Is a new document plagiarized from a document in large corpus   
 
-#### § Tree & Graph
+### § Tree & Graph
 Tree can be seen as connected graph (every node can be reached) without cycle, as one node can only have one parent.
 
 **Binary Search Tree (BST)**   
