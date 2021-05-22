@@ -1,15 +1,3 @@
-
-### Schedule
-```sh
-✓ Stack     DP, recursive
-✓ Hash      BFS, DFS
-✓ Tree      BST
-- Heap      Bit
-- Trie
-
-System design / Interview experience
-```
-
 ## Data structure
 Fundamentally (physically), all data structure could be categorised as two:
 
@@ -182,13 +170,13 @@ It is an abstract data type that allow accessing item by given key (like associa
 **Hash table**   
 Hash function maps keys into large integers, mod by `m` which is number of slots of hash table. The result integer is index where we store the actual data. When two keys are mapped into same integers, causing collision.   
 
-*Collision by chaining*   
+- *Collision by chaining*   
 Use an array of **`m`** linked lists, If keys are evenly distributed, we have **`m`** close to **`n`** (total number of items), list in each 'slot' contains just a few items. The search is O(1) to locate bucket, and linear search through linked list      
  **?** How to choose `m`, reasonably large prime number
 
-*Collision by open addressing*   
+- *Collision by open addressing*   
 
-☞ Problems nicely solved by hash:   
+Problems nicely solved by hash:   
  - Substring pattern match (Rabin-Karp)   
  `n = |S|` length of original string,  `m = |p|` length of pattern string   
  `n - m + 1` windows hashing of S, 1 hashing of p, total *O(n-m+2)* hash computation. The next window hash H(S, j+1) can be based on previous one H(S, j)
