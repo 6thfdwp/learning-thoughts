@@ -362,8 +362,8 @@ To fix, cancel all subscriptions and asynchronous tasks
 
 # Generalize the Middleware
 
-Provide great extensibility, each middleware is like a plugin function that's attached to the processing pipeline, and gets invoked in order.  
-Each middleware function implement what to do (custom portion of logic), receives a special `next` funciton (implemented by middleware libs) [x1] to pass the execution to the next middleware, until it reaches to the last or the early return (e.g error thrown).
+We've seen this pattern a lot, in Express, Redux and Apollo client. Generally it is used to provide great extensibility to the core framework, each middleware is like a plugin function that's attached to the processing pipeline, and gets invoked in order.  
+Each middleware function implement what to do (custom portion of logic), receives a special `next` funciton (implemented by the framework) [x1] to pass the execution to the next middleware, until it reaches to the last or the early return (e.g error thrown).
 
 ### The components of a middleware library
 
@@ -418,4 +418,4 @@ function applyByMonkeyPatching(store, middlewares) {
 }
 ```
 
-▪︎ [x1] a bit like IoC? Cusom portions of a computer program receive the flow of control from a generic framework
+▪︎ [x1] a bit like IoC? As Wiki explains: Cusom portions of a computer program receive the flow of control from a generic framework

@@ -1,28 +1,3 @@
-[# Private fields filtering ](https://github.com/parse-community/parse-server/issues/3155) with [PR 3158](https://github.com/parse-community/parse-server/pull/3158)  
-[# 4672 File (image, pdf..) access control](https://github.com/parse-community/parse-server/issues/4672),  
-[# 1023](https://github.com/parse-community/parse-server/issues/1023)
-
-> The deletion is working with the file URL without app ID. i.e.:
-
-```sh
-# not working
-curl -X DELETE -H "X-Parse......" http://domain/parse/files/appid/file
-# working
-curl -X DELETE -H X-Parse...... http://domain/parse/files/file
-```
-
-[# Discussion parse server in cloud scale](https://github.com/parse-community/parse-server/issues/4278)  
-[# Discussion on perf](https://github.com/parse-community/parse-server/issues/2539)  
-[# Scale horizontally](https://github.com/parse-community/parse-server/issues/4564)  
-[# Cache grows without prune](https://github.com/parse-community/parse-server/issues/4247)
-
-```
-
-Startup a parse-server, without enableSingleSchemaCache
-use heapdump through require('heapdump') in your startup script
-notice that the memory keeps growing after each request.
-```
-
 ## Contribute to Parse server
 
 ☞ [Git fork and PR flow](https://gist.github.com/Chaser324/ce0505fbed06b947d962)
@@ -54,6 +29,33 @@ If we need to use parse-server code we are currently working on,
 ```sh
 npm link parse-server path/to/cloned/repo
 npm install
+```
+
+### Issues tracker
+
+[# Private fields filtering ](https://github.com/parse-community/parse-server/issues/3155) with [PR 3158](https://github.com/parse-community/parse-server/pull/3158)  
+[# 4672 File (image, pdf..) access control](https://github.com/parse-community/parse-server/issues/4672),  
+[# 1023](https://github.com/parse-community/parse-server/issues/1023)
+
+> The deletion is working with the file URL without app ID. i.e.:
+
+```sh
+# not working
+curl -X DELETE -H "X-Parse......" http://domain/parse/files/appid/file
+# working
+curl -X DELETE -H X-Parse...... http://domain/parse/files/file
+```
+
+[# Discussion parse server in cloud scale](https://github.com/parse-community/parse-server/issues/4278)  
+[# Discussion on perf](https://github.com/parse-community/parse-server/issues/2539)  
+[# Scale horizontally](https://github.com/parse-community/parse-server/issues/4564)  
+[# Cache grows without prune](https://github.com/parse-community/parse-server/issues/4247)
+
+```
+
+Startup a parse-server, without enableSingleSchemaCache
+use heapdump through require('heapdump') in your startup script
+notice that the memory keeps growing after each request.
 ```
 
 ## [Security](http://docs.parseplatform.org/js/guide/#security)
