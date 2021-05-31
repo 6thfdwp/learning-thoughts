@@ -81,7 +81,7 @@ For the string problems, need to clarify before solving, here are a few common o
 - How should we deal with special chars, `space`, `tab` etc
 - Is the string ASCII (256 char set) or unicode (2 bytes),
 
-### Stack & Queue
+### § Stack & Queue
 can be implemented with either array or linked list.
 ```py
 # array for stack
@@ -135,7 +135,7 @@ Another use of stack is to change recursive procedure to iteration. e.g BST in (
 
 Queue is most commonly used in BFS, For each node, keep adding adjacent items to the queue
 
-### Priority Queue
+### § Priority Queue
 `heap` is one of efficient implementation for PQ, use an array to maintain partial order. One item dominates its children by having the smaller key (min heap) than itself or bigger key (max heap).   
 ```sh
           5
@@ -402,3 +402,8 @@ Assume each entry represents number range
 
     # finally check bv, return number corresponding to any bit 0
  ```
+
+## Leetcode  
+E: https://leetcode.com/problems/valid-parentheses/
+
+M: https://leetcode.com/problems/generate-parentheses/
