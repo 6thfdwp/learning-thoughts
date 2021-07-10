@@ -346,21 +346,11 @@ Class component, stateless or stateful, could perform side effect, but only re-r
 
 > It is safe to use PureComponents as atoms, ie small and final things like buttons. But it is not safe to use them in chromes, forms, pages and other molecules.
 
-**Discover where to optimise**
-
 https://building.calibreapp.com/debugging-react-performance-with-react-16-and-chrome-devtools-c90698a522ad
 
 ---
 
-### Caveats
-
-```
-Can't call setState (or forceUpdate) on an unmounted component,
-it indicates a memory leak in your application
-To fix, cancel all subscriptions and asynchronous tasks
-```
-
-# Generalize the Middleware
+## Generalize the Middleware
 
 We've seen this pattern a lot, in Express, Redux and Apollo client. Generally it is used to provide great extensibility to the core framework, each middleware is like a plugin function that's attached to the processing pipeline, and gets invoked in order.  
 Each middleware function implement what to do (custom portion of logic), receives a special `next` funciton (implemented by the framework) [x1] to pass the execution to the next middleware, until it reaches to the last or the early return (e.g error thrown).
@@ -419,3 +409,25 @@ function applyByMonkeyPatching(store, middlewares) {
 ```
 
 ▪︎ [x1] a bit like IoC? As Wiki explains: Cusom portions of a computer program receive the flow of control from a generic framework
+
+---
+
+## Patterns implement IoC
+
+> Don't call us, I will call you
+
+### IoC through Dependency Injection (DI)
+
+What is acutally inverted ?  
+The dependency is never acquired through client(consumer) class itself by direct instantiation (aka `new`), but injected from outside mostly passed as abstract interface.
+
+### IoC through Observer
+
+Similar in event listener, what is inverted is the control of when observer gets called and passed in necessary info they are interested in, not observer goes to grab and do stuff.  
+The observable subject is the one who controls when it triggers and what info it passes
+
+### IoC through Template method
+
+What is acutally inverted ?  
+The subclass implements methods, but get called by super class.
+Like old Java Servlet world or new (deprecated..) React class component, subclasses all implement lifecycle methods
