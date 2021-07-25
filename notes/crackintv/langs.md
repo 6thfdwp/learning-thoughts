@@ -61,6 +61,8 @@ for (var i=0; i<items.length; i++) {
 }
 ```
 
+---
+
 ▪︎ [x1]: `IIFE` (immediatly invoked function expression)  
 Need to be wrapped inside an extra `()`
 
@@ -70,4 +72,46 @@ Need to be wrapped inside an extra `()`
 
 ▪︎ [x2]: `try...catch` the error is block scoped in the `catch`
 
-### Async Patterns
+---
+
+## Async Patterns
+
+### Not so real Parallelism
+
+This is more related to JS runtime (be it in browser or NodeJS). Essentially there is one call stack, task (event) queue, and orchestrated by Event Loop.
+
+There is actually another Job queue (every Promise `then` callback) layered on top of event queue. Job queue will be fully processed before next **event** tick.
+
+```js
+while taskQ not empty:
+  // each loop to pick one task to execute on stack is called 'tick'
+  if stack is empty:
+    task = taskQ.dequeue()
+    stack.push(task)
+    // run the callback JS code
+    exec(task)
+
+    while task.jobQ is not empty: // to be reviewed
+      job = task.jobQ.dequeue()
+      // e.g run then callback
+      exec(job)
+```
+
+The main different with parallel, e.g in multi threads env is there is only one single call stack, code is `run to completion`. Parallel, on the other hand could have multi call stacks (corresponding to each running threads). Means different pieces of code could run simultaneously, all the statements inside those code chunks could be interleaving!! When they try to access the shared memory (NOTE: JS also has shared memory through scope chain), it's becoming very undeterministic.
+
+This is not saying JS async is deterministic. JS could have race condition and become unpredictable as well (we don't always know when each callback is triggered, the ordering of processing tasks could be different)  
+And this only happens in the 'task' (function) level, no matter how many statements it has, coz it's always `run to completion`.
+
+But this could lead to another issue: block event 'tick' when it takes too long to complete a task.
+
+### Cooperative Concurrency
+
+The common techniques to solve blocking the event 'tick' is to keep call stack lean by breaking long running JS code logic into chunks or batches, spreading over multi call stack frame.
+
+- How to split  
+  If it's a large array to process, could we split into multi smaller array? If it's deeply nested object tree, consider using iteration over recursion to build some linked data structure.
+
+- How to continue what is left
+  Rely on closure or linked structure (we know the head of current list)
+
+### Async Ordering

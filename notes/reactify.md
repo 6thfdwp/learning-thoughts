@@ -430,4 +430,4 @@ The observable subject is the one who controls when it triggers and what info it
 
 What is acutally inverted ?  
 The subclass implements methods, but get called by super class.
-Like old Java Servlet world or new (deprecated..) React class component, subclasses all implement lifecycle methods
+Like old Java Servlet world or React class component(deprecated..), our components implement lifecycle methods, it's React to decide when to trigger them.
