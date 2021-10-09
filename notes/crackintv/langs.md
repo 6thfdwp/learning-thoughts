@@ -13,7 +13,7 @@ During execution, look up variables through the chain to see if a variable can b
 
 ### Function Scope
 
-The most common unit of scope, each function defines (encloses) its scope. The scope consists of all variables declared as `var`, also all arguments passed in.
+The most common unit of scope, each function defines (encloses) its scope. The scope consists of all variables declared inside with `var, let, const`, also all arguments passed in.
 
 Function expression (can be anonymous) also forms a scope. Common use is to be passed as callback, or IIFE to be discussed [x1]
 
@@ -111,7 +111,11 @@ The common techniques to solve blocking the event 'tick' is to keep call stack l
 - How to split  
   If it's a large array to process, could we split into multi smaller array? If it's deeply nested object tree, consider using iteration over recursion to build some linked data structure.
 
-- How to continue what is left
+- How to continue what is left  
   Rely on closure or linked structure (we know the head of current list)
 
 ### Async Ordering
+
+https://hacks.mozilla.org/2016/11/cooperative-scheduling-with-requestidlecallback/
+
+https://developers.google.com/web/updates/2015/08/using-requestidlecallback
