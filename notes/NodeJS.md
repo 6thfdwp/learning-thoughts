@@ -210,25 +210,23 @@ async function asyncFunc() {
 
 ```js
 async function downloadContent(urls) {
-    return urls.map(url => {
-        // Wrong syntax! No async in map callback
-        const content = await httpGet(url);
-        return content;
-    });
+  return urls.map((url) => {
+    // Wrong syntax! No async in map callback
+    const content = await httpGet(url);
+    return content;
+  });
 }
 async function downloadContent(urls) {
-    // we cannot directly return map, as it's just sync call
-    // with an array of promise returned from each callback
-    const proms = urls.map(async (url) => {
-        // need to declare the map callback as async
-        const content = await httpGet(url);
-        return content;
-    });
-    await Promise.all(proms);
-    // or
-    // return Promise.all(m) ?
+  // we cannot directly return map, as it's just sync call
+  // with an array of promise returned from each callback
+  const proms = urls.map(async (url) => {
+    // need to declare the map callback as async
+    const content = await httpGet(url);
+    return content;
+  });
+  return Promise.all(proms);
 }
-
+// use it
 const contents = await downloadContent(urls);
 ```
 

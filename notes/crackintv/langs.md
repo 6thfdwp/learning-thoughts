@@ -15,7 +15,7 @@ During execution, look up variables through the chain to see if a variable can b
 
 The most common unit of scope, each function defines (encloses) its scope. The scope consists of all variables declared inside with `var, let, const`, also all arguments passed in.
 
-Function expression (can be anonymous) also forms a scope. Common use is to be passed as callback, or IIFE to be discussed [x1]
+Function expression (can be anonymous) also forms a scope. Common use is to be passed as callback, or IIFE to be discussed `[x1]`
 
 ### Block Scope
 

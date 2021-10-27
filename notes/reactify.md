@@ -293,8 +293,6 @@ Here is another use case for HOC, implemented as `render` callback, allow extra 
 If yes, we certainly need to perform reconciliation process: re-rendering on that component to generate new elements tree, diff it with previous and figure out DOM updates.  
 If no, we can skip the process from that component and its entire subtree.
 
-Most case, it does not hurt when always re-rendering the whole subtree upon a component state change.
-
 • Functional (stateless) component  
 Implemented as pure function (not Pure component), the output is only based on input props
 
