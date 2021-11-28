@@ -119,3 +119,81 @@ The common techniques to solve blocking the event 'tick' is to keep call stack l
 https://hacks.mozilla.org/2016/11/cooperative-scheduling-with-requestidlecallback/
 
 https://developers.google.com/web/updates/2015/08/using-requestidlecallback
+
+## Prototype Inheritance
+
+`new` is used to invoke a function `A` as constructor, which is useful to create objects that share properties (like functions as instance methods)
+
+1. Create an empty object internally (let's call it `o`), `this` refers to `o`
+2. Execute function body `this.x = 1` attach instance's properties
+3. `o` internal [[prototype]] is pointed to constructor function's prototype (public access) `o.__proto__ = A.prototype`
+4. `o.constructor` is available via prototype chain, actually it is A's constructor function
+5. `o` returned as constructor function result
+
+```js
+function A(x, y) {
+  // function body essentially becomes constructor
+  // which attached to A.prototype, but different from A.constructor
+  this.x = x;
+  this.y = y;
+}
+A.prototype = {
+  do() {},
+};
+
+// A.prototype.constructor === A  true
+let o = new A(1, 2);
+// o.__proto__ === {constructor: f A(x, y), do: f }
+// o.constructor === A true
+// Object.getPrototypeOf(o) can also get what an object internal __proto__ look like
+
+// all code in the class body can be seen as defining A prototype (except static)
+class A {
+  constructor(x, y) {}
+
+  do() {}
+  static staticMethod() {}
+}
+```
+
+> the class keyword are effectively turned inside out: Given a class C, its method constructor becomes a function C and all other methods are added to C.prototype.
+
+In Javascript, there are different ways to create object, each end up with a particular chain.
+
+```js
+// o2.__proto__ -> o1:{a:1} -> Object.prototype -> null
+var o1 = { a: 1 };
+var o2 = Object.create(o1);
+o2.b = 2;
+
+// arr.__proto__ -> Array.prototype -> Object.prototype -> null
+var arr = [1];
+
+// p.__proto__ -> Person.prototype (constructor and other methods)
+// -> Object.prototype -> null
+function Person(name) {
+  this.name = name;
+}
+var p = new Person('John');
+```
+
+Look at another example of how a simple inheritance would be implemented. We can also use `Object.create` to instantiate new object with other objects as its prototype
+
+```js
+function Person(name) {
+  this.name = name;
+}
+Person.prototype.show = function () {};
+
+function Student(name, uni) {
+  Person.call(this, name);
+  this.uni = uni;
+}
+Student.prototype = Object.create(Person.prototype);
+// override (Person.prototype.constructor)
+Student.prototype.constructor = Student;
+Student.prototype.show = function () {
+  return `${Person.prototype.show.call(this)} at ${this.uni}`;
+};
+Student.prototype.otherMethod = function () {};
+```

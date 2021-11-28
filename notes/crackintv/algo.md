@@ -288,16 +288,21 @@ distribution sort by bucketing
 
 **Search Consideration**
 
-Binary search is important, and has some variances, e.g. in rotating sorted array, or sorted array with duplicates.
+Binary search is about to reduce the search space fast, and has some variances, e.g. in rotating sorted array, or sorted array with duplicates. The first (left most) or last (right most) element that matches the criteria.
 
-Binary search can be generalised beyond find the element in sorted array. As long as the search space is monotonic (increasing or decreasing in one direction). Or think in this way: we check element x in the search space against some predicate of the domain _f_:  
-if f(x2) == true, elements that are in the **`right`** side (could means bigger) of x2 are also true, f(x+1) == true ..  
-if f(x1) == false, elements that are in the **`left`** side (could means smaller) of x1 are also false, f(x-1) == false ..
+Binary search can be generalised beyond find the element in sorted array. As long as the search space is monotonic (in one direction). Or think in this way: we check element x in the search space against some predicate of the domain _f_:
+
+```
+if f(x2) == true, elements that are in the right side (could means bigger) of x2 are also true, f(x+1) == true ..
+if f(x1) == false, elements that are in the left side (could means smaller) of x1 are also false, f(x-1) == false ..
+```
 
 Search space checked against some predicate looks like this:
-
 `false false false false(<-x1) true(x2->) true true true`  
-With generalised approach, some problems can also be solved by BS, like find closest square root number for given x: `floor(sqrt(x))`
+The normal finding number, its _f_ is simply x > target. Sometimes have to come up with the creative _f_ to be able to halve the space.  
+Some exapmples:  
+▪︎ [Single element in a sorted array](https://leetcode.com/problems/single-element-in-a-sorted-array/)  
+▪︎ find closest square root number for given x: `floor(sqrt(x))`
 
 ### § Recursion and Dynamic programming
 
