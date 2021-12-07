@@ -120,6 +120,104 @@ https://hacks.mozilla.org/2016/11/cooperative-scheduling-with-requestidlecallbac
 
 https://developers.google.com/web/updates/2015/08/using-requestidlecallback
 
+### Async-Await Syntax Sugar
+
+From this article: http://2ality.com/2016/10/async-function-tips.html
+
+- The result of an async function is **ALWAYS** a Promise p. That Promise is created when starting the execution of the async function.
+- The body is executed. Execution may finish permanently via return or throw (p is resolved with returned value or rejected with thrown error).
+- Or it may finish temporarily via await; in which case execution will usually continue later on. You can think of it like all code after await is wrapped magically in await then's callback
+- The Promise p is returned immediately.
+
+```js
+async function asyncFunc() {
+  // resolve implicit p with 123
+  return 123;
+  // returning a Promise means that p from asyncFunc now mirrors
+  // the state of this new Promise
+  // return Promise.resolve(123);
+}
+asyncFunc().then((v) => console.log(v)); // 123
+
+async function asyncFunc() {
+  throw new Error('Problem!');
+  // similar to this
+  // return Promise.reject(new Error('Problem!'));
+}
+asyncFunc().catch((e) => console.log(e)); // Error: Problem!
+```
+
+`async` keyword will forward any async call inside it to be chained from outside
+
+```js
+async function asyncFunc() {
+  return anotherAsyncFunc();
+  // similar
+  // const value = await anotherAsyncFunc();
+  // return value;
+}
+asyncFunc().then((value) => {
+  // get what's resolved from anotherAsyncFunc
+});
+```
+
+No need to always `await` if we don't want consume the resolved value (just fire async call and continue)
+
+```js
+async function asyncFunc() {
+  anotherAsyncFunc();
+  // continue will be logged immediately when asyncFunc returned
+  console.log('continue');
+}
+```
+
+`await` should be wrapped by a direct `async`, there is no such thing like closure,
+
+```js
+async function downloadContent(urls) {
+  return urls.map((url) => {
+    // Wrong syntax! No async in map callback
+    const content = await httpGet(url);
+    return content;
+  });
+}
+async function downloadContent(urls) {
+  // we cannot directly return map, as it's just sync call
+  // with an array of promise returned from each callback
+  const proms = urls.map(async (url) => {
+    // need to declare the map callback as async
+    const content = await httpGet(url);
+    return content;
+  });
+  return Promise.all(proms);
+}
+// use it
+const contents = await downloadContent(urls);
+```
+
+[Async Exception handling](https://github.com/mbeaudru/modern-js-cheatsheet/issues/54)  
+We should avoid pass unnecessary callback pairs or try...catch every async call.
+As the major win from promise is able to propagate the error through chaining until it finds one handling it  
+We could catch in the middle of chaining if there is need, but do not just throw it again.
+
+```js
+fetch('token_url')
+  .then((token) => fetchPost(id, token))
+  .then((post) => JSON.parse(post))
+  .catch((e) => {
+    // it can catch promise rejection and normal throw
+    // e will whatever exception raised from fetch token, fetchPost or JSON.parse
+    // the original error type and stack trace will be kept
+  });
+
+// same as
+try {
+  const token = await fetch('token_url');
+  const post = await fetchPost(id, token);
+  return JSON.parse(post);
+} catch (e) {}
+```
+
 ## Prototype Inheritance
 
 `new` is used to invoke a function `A` as constructor, which is useful to create objects that share properties (like functions as instance methods)
