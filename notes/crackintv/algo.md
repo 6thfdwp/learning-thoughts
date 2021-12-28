@@ -188,7 +188,7 @@ The common ops in `heap`:
 
 - retrieve min/max: O(1)
 
-As `heap` maintaining the priority (either descending or ascending) efficiently, it is used as core data structure in BFS for shortest path
+As `heap` maintaining the priority (invariance) (be it min/max, longest, earliest etc.) efficiently, it is used as core data structure in BFS for shortest path or other top K type of problems. During each iteration, we can always get the **desired** item with O(1)
 
 ### § Dictionary
 
@@ -284,7 +284,15 @@ Short comparisons for a few sorting algorithms:
 
   This is actually the selection sort on top of priority queue (implemented as heap). The data structure helps to extract min (find and delete) from the rest of items in log(N)
 
-distribution sort by bucketing
+  ```pt
+  def heapsort(iterable):
+    h = []
+    for value in iterable:
+        heappush(h, value)
+    return [heappop(h) for i in range(len(h))]
+  ```
+
+- distribution sort by bucketing
 
 **Search Consideration**
 
