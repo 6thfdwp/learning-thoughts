@@ -295,3 +295,21 @@ Student.prototype.show = function () {
 };
 Student.prototype.otherMethod = function () {};
 ```
+
+## Other topics
+### Event Delegation 
+Attach a handler to parent, so all child items can use the same, e.g click in large list
+
+
+### Web App Optimisation 
+FE:
+- Code split to break down large bundle 
+- Browser cache
+- Lazy loading
+- Minification and gzip compression 
+- Async requests (batch or prioritise some requests to show critical content )
+
+### Web app security/auth
+- XSS
+- CSRF
+- CORS
